@@ -226,7 +226,8 @@
 <button onclick="switchPage('stats')"><span class="nav-icon">📊</span>状态</button>
 <button onclick="switchPage('settings')"><span class="nav-icon">⚙️</span>设置</button>
 </div>
-</div><script>
+</div>
+<script>
 // ═══════════════════ 全局状态 ═══════════════════
 const S = {
     affection: 92, trust: 88, intimacy: 90, exposure: 25,
@@ -691,7 +692,9 @@ function getNowTime() { const n = new Date(); return `${String(n.getMonth()+1).p
 function wxQuick(action) {
     const input = document.getElementById('userInput');
     switch (action) { case 'voice': input.value = '[发了一条语音消息]'; break; case 'image': input.value = '[发了一张照片]'; break; case 'video': input.value = '[发起视频通话]'; break; case 'call': input.value = '[打电话]'; break; case 'transfer': input.value = '[转账500元]'; break; case 'moments': input.value = '[发朋友圈]'; break; }
-    sendMessage();// ═══════════════════ 状态更新 ═══════════════════
+    sendMessage();
+}
+    // ═══════════════════ 状态更新 ═══════════════════
 function updateFromAI(text) {
     const sm = text.match(/💗好感:(\d+)\/100.*?🔒信任:(\d+)\/100.*?💫亲密:(\d+)\/100.*?📸曝光:(\d+)\/100/s);
     if (sm) { if (!isNaN(+sm[1])) S.affection = +sm[1]; if (!isNaN(+sm[2])) S.trust = +sm[2]; if (!isNaN(+sm[3])) S.intimacy = +sm[3]; if (!isNaN(+sm[4])) S.exposure = +sm[4]; }
@@ -1173,4 +1176,3 @@ init();
 </script>
 </body>
 </html>
-}

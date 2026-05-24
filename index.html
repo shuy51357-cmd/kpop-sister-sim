@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-    <title>📱 韩娱嫂子模拟器</title>
+    <title>📱 韩娱嫂子模拟器 v6.0</title>
     <style>
         :root {
             --bg: #0a0a0f;--surface: #12121a;--surface2: #1a1a28;--text: #d4d4dc;--text2: #a0a0b8;
-            --accent: #c9a0dc;--accent2: #e8b4b8;--gold: #d4a574;--border: #252540;
-            --wechat-bg: #ededed;--wechat-green: #07c160;--font-size: 14px;
+            --accent: #c9a0dc;--accent2: #e8b4b8;--border: #252540;--wechat-bg: #ededed;
+            --wechat-green: #07c160;--font-size: 14px;
             --font: 'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif;
         }
         .theme-light {
-            --bg: #f5f5f7;--surface: #ffffff;--surface2: #f0f0f5;--text: #1a1a1a;--text2: #666;
-            --accent: #8b5cf6;--accent2: #ec4899;--border: #e0e0e0;--wechat-bg: #ededed;
+            --bg: #f5f5f7;--surface: #fff;--surface2: #f0f0f5;--text: #1a1a1a;--text2: #666;
+            --accent: #8b5cf6;--accent2: #ec4899;--border: #e0e0e0;
         }
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:var(--font);font-size:var(--font-size)}
@@ -32,13 +32,21 @@
         .messages{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
         .messages.wx{background:var(--wechat-bg)}
         @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-        .msg{max-width:85%;padding:10px 13px;border-radius:14px;line-height:1.6;font-size:var(--font-size);animation:fadeIn .25s ease}
+        .msg{max-width:85%;padding:10px 13px;border-radius:14px;line-height:1.6;font-size:var(--font-size);animation:fadeIn .25s ease;position:relative}
         .msg.usr{align-self:flex-end;background:var(--surface2);border:1px solid var(--border);border-bottom-right-radius:4px;color:var(--text)}
         .msg.char{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text)}
         .msg .sender{font-size:10px;font-weight:700;margin-bottom:3px}
         .msg.usr .sender{color:var(--accent2)}.msg.char .sender{color:var(--accent)}
         .msg .body{white-space:pre-wrap;word-break:break-word;color:var(--text)}
-        .wx-msg{max-width:75%;margin:2px 0;animation:fadeIn .2s ease;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+        .msg .msg-actions{display:flex;gap:4px;margin-top:6px;padding-top:4px;border-top:1px solid var(--border);font-size:9px}
+        .msg .msg-actions span{cursor:pointer;color:var(--text2);padding:2px 5px;border-radius:3px;transition:all .2s}
+        .msg .msg-actions span:hover{background:var(--surface2);color:var(--accent)}
+        .msg .alt-versions{margin-top:6px;padding:8px;background:var(--surface2);border-radius:8px;border:1px dashed var(--border);font-size:11px}
+        .msg .alt-versions .alt-item{padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer}
+        .msg .alt-versions .alt-item:hover{color:var(--accent)}
+        .msg .alt-versions .alt-item.selected{border-left:3px solid var(--accent);padding-left:8px;font-weight:700}
+        /* 微信消息 */
+        .wx-msg{max-width:75%;margin:2px 0;animation:fadeIn .2s ease;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;position:relative}
         .wx-msg.me{align-self:flex-end;text-align:right}.wx-msg.you{align-self:flex-start;text-align:left}
         .wx-msg .wx-time{text-align:center;font-size:10px;color:#b0b0b0;margin:8px 0 2px;align-self:center;background:#d9d9d9;display:inline-block;padding:2px 8px;border-radius:3px}
         .wx-msg .wx-bubble{display:inline-block;padding:9px 12px;border-radius:4px;font-size:15px;line-height:1.5;word-break:break-word;color:#111}
@@ -46,6 +54,18 @@
         .wx-msg .wx-header{font-size:10px;color:#999;margin-bottom:2px;padding:0 4px}
         .wx-msg .wx-trans{font-size:11px;color:#888;margin-top:2px;padding:0 4px}
         .wx-msg .wx-ip{font-size:9px;color:#bbb;margin-top:2px;padding:0 4px}
+        .wx-msg .wx-msg-actions{display:none;gap:3px;margin-top:2px;font-size:9px;padding:0 4px}
+        .wx-msg:hover .wx-msg-actions{display:flex}
+        .wx-msg .wx-msg-actions span{cursor:pointer;color:#bbb;padding:1px 4px}
+        /* 微信首页 */
+        .wx-list-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #e0e0e0;cursor:pointer;background:#fff;transition:all .1s}
+        .wx-list-item:active{background:#e0e0e0}
+        .wx-list-item .wl-avatar{width:44px;height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:#e8e8e8}
+        .wx-list-item .wl-info{flex:1;min-width:0}
+        .wx-list-item .wl-name{font-weight:600;font-size:15px;color:#111}
+        .wx-list-item .wl-preview{font-size:12px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .wx-list-item .wl-time{font-size:10px;color:#bbb;flex-shrink:0}
+        /* 输入区 */
         .input-area{padding:8px 10px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:6px;flex-shrink:0}
         .input-area.wx{background:#f7f7f7;border-top:1px solid #d9d9d9}
         .input-area textarea{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:8px 14px;color:var(--text);font-family:var(--font);font-size:var(--font-size);resize:none;min-height:36px;max-height:80px;outline:none}
@@ -56,131 +76,157 @@
         .wx-actions{display:none;gap:4px;padding:4px 10px;background:#f7f7f7;flex-shrink:0}
         .wx-actions.show{display:flex}
         .wx-actions button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px;border-radius:4px}
+        /* 返回按钮 */
+        .wx-back{display:none;align-items:center;gap:6px;padding:8px 12px;background:#ededed;border-bottom:1px solid #d9d9d9;font-size:14px;color:#111;cursor:pointer;flex-shrink:0}
+        .wx-back.show{display:flex}
+        .wx-back .back-name{font-weight:700}
+        /* 发现页 */
         .discover-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
         .discover-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .2s}
         .discover-card:active{border-color:var(--accent)}
         .ci{font-size:32px;margin-bottom:6px}.cl{font-size:12px;font-weight:700;color:var(--text)}.cs{font-size:10px;color:var(--text2)}
-        .social-post{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:4px 10px;font-size:11px}
+        /* 社交Feed */
+        .social-post{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:4px 10px;font-size:11px;cursor:pointer}
         .social-post .ph{display:flex;align-items:center;gap:8px;margin-bottom:6px}
         .social-post .pa{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--surface2)}
-        .social-post .pu{font-weight:700;font-size:12px;color:var(--text)}
-        .social-post .phn{font-size:10px;color:var(--text2)}
+        .social-post .pu{font-weight:700;font-size:12px;color:var(--text)}.social-post .phn{font-size:10px;color:var(--text2)}
         .social-post .pp{font-size:9px;color:var(--accent);margin-left:auto;padding:2px 6px;background:rgba(139,92,246,.15);border-radius:4px}
         .social-post .pb{color:var(--text);line-height:1.5;margin-bottom:6px}
         .social-post .pst{display:flex;gap:18px;font-size:10px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
         .social-post .pst span{cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .2s}
-        .social-post .pst span:hover{background:var(--surface2)}
-        .social-post .pst span.liked{color:#e74c3c;font-weight:700}
-        .social-post .pti{font-size:9px;color:#888;margin-top:4px}
-        .social-post.new{border-left:3px solid var(--accent)}
-        .douban-post{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin:4px 10px;font-size:11px}
-        .douban-post .dg{font-size:9px;color:#6ba346;margin-bottom:4px}
-        .douban-post .dt{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
-        .douban-post .db{color:var(--text);line-height:1.6;margin-bottom:6px}
-        .douban-post .dc{background:var(--surface2);border-radius:6px;padding:8px;margin-top:6px}
-        .douban-comment{padding:4px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--text)}
-        .douban-comment .cu{color:#6ba346;font-weight:600}
+        .social-post .pst span:hover{background:var(--surface2)}.social-post .pst span.liked{color:#e74c3c;font-weight:700}
+        .social-post .pti{font-size:9px;color:#888;margin-top:4px}.social-post.new{border-left:3px solid var(--accent)}
+        .social-post .translate-btn{font-size:9px;color:var(--accent);cursor:pointer;margin-left:4px}
+        /* 状态卡 */
         .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin:4px 10px}
-        .stat-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px}
-        .sl{color:var(--text2)}.sv{font-weight:700;color:var(--text)}
+        .stat-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px}.sl{color:var(--text2)}.sv{font-weight:700;color:var(--text)}
         .mini-bar{width:100%;height:3px;background:var(--border);border-radius:2px;margin:2px 0 8px}
         .mini-bar-fill{height:100%;border-radius:2px;transition:width .5s}
         .tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:9px;font-weight:600}
         .tag-on{background:#e74c3c22;color:#e74c3c}.tag-off{background:#88888822;color:#888}
+        /* 设置 */
         .settings-section{padding:14px;color:var(--text)}
         .settings-section h4{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px}
         .settings-btn{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:8px;text-align:left;cursor:pointer;font-size:13px;margin:3px 0;display:flex;align-items:center;gap:8px}
-        .settings-btn:active{border-color:var(--accent)}
-        .settings-btn.danger{color:#e74c3c;border-color:#e74c3c33}
-        .typing-dots{display:flex;gap:4px;padding:8px 12px;align-self:flex-start}
-        .typing-dots span{width:6px;height:6px;border-radius:50%;background:#999;animation:bounce 1.2s infinite}
-        .typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
-        @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+        .settings-btn:active{border-color:var(--accent)}.settings-btn.danger{color:#e74c3c;border-color:#e74c3c33}
+        .settings-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+        .settings-row .sr-label{font-size:12px;color:var(--text)}.settings-row input,.settings-row select{width:120px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;text-align:right}
+        /* 弹窗 */
         .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:9999;display:none;align-items:center;justify-content:center}
         .modal-overlay.show{display:flex}
         .modal{background:#1a1a28;border:1px solid #333;border-radius:16px;padding:22px;width:380px;max-width:92vw;max-height:80vh;overflow-y:auto;color:#d4d4dc}
         .modal h3{color:#fff;margin-bottom:10px;font-size:17px}
         .modal label{display:block;color:#a0a0b8;font-size:11px;margin-bottom:3px;margin-top:10px}
-        .modal input,.modal select{width:100%;background:#0a0a0f;border:1px solid #333;border-radius:8px;padding:8px 10px;color:#d4d4dc;font-size:13px;outline:none;margin:4px 0}
+        .modal input,.modal select,.modal textarea{width:100%;background:#0a0a0f;border:1px solid #333;border-radius:8px;padding:8px 10px;color:#d4d4dc;font-size:13px;outline:none;margin:4px 0}
         .modal .btn-row{display:flex;gap:8px;margin-top:14px}
         .btn-pri{flex:1;background:#c9a0dc;border:none;color:#000;font-weight:700;padding:10px;border-radius:8px;cursor:pointer}
         .btn-sec{flex:1;background:#1a1a28;border:1px solid #333;color:#d4d4dc;padding:10px;border-radius:8px;cursor:pointer}
         .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 18px;border-radius:18px;font-size:12px;z-index:9999;pointer-events:none;animation:fadeIn .3s ease}
         .badge-dot{width:8px;height:8px;border-radius:50%;background:#e74c3c;position:absolute;margin-left:14px;margin-top:-4px}
-        .theme-options{display:flex;gap:8px;flex-wrap:wrap}
-        .theme-dot{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
-        .theme-dot.active{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.4)}
-        .font-size-row{display:flex;gap:8px;align-items:center}
-        .font-size-row button{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer}
-        .font-size-row .fs-val{font-weight:700;color:var(--text);min-width:40px;text-align:center}
+        .typing-dots{display:flex;gap:4px;padding:8px 12px;align-self:flex-start}
+        .typing-dots span{width:6px;height:6px;border-radius:50%;background:#999;animation:bounce 1.2s infinite}
+        .typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+        @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
         .page::-webkit-scrollbar,.messages::-webkit-scrollbar{width:3px}
         .page::-webkit-scrollbar-thumb,.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+        .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+        .toggle-switch input{display:none}
+        .toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#444;border-radius:24px;cursor:pointer;transition:.3s}
+        .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+        .toggle-switch input:checked+.toggle-slider{background:var(--accent)}
+        .toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
+        .setting-doc-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface2);border-radius:6px;margin:4px 0;font-size:11px}
+        .setting-doc-item .doc-name{color:var(--text);font-weight:600}.setting-doc-item .doc-status{font-size:9px;color:var(--text2)}
+        .mini-btn{padding:2px 8px;border-radius:10px;font-size:9px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2)}
+        .mini-btn.danger{color:#e74c3c;border-color:#e74c3c44}
     </style>
 </head>
 <body>
 
-    <!-- 弹窗(手机壳外) -->
-    <div class="modal-overlay" id="apiModal"><div class="modal">
-            <h3>⚙️ API 设置</h3>
-            <label>提供商</label><select id="apiProvider" onchange="onProvChange()"><option value="deepseek">DeepSeek(推荐)</option><option value="openai">OpenAI</option><option value="custom">自定义</option></select>
-            <label>API Key</label><input type="password" id="apiKey" placeholder="sk-...">
-            <label>Base URL</label><input type="text" id="apiBase" placeholder="https://api.deepseek.com">
-            <label>模型</label><input type="text" id="modelName" placeholder="deepseek-chat">
-            <div class="btn-row"><button class="btn-sec" onclick="closeModal('apiModal')">取消</button><button class="btn-pri" onclick="saveAPISettings()">💾保存</button></div>
-            <div style="font-size:9px;color:#a0a0b8;margin-top:8px;text-align:center">💡 platform.deepseek.com → API Keys<br>正确地址: https://api.deepseek.com</div>
-    </div></div>
+<!-- 弹窗 -->
+<div class="modal-overlay" id="apiModal"><div class="modal">
+<h3>⚙️ API 设置</h3>
+<label>提供商</label><select id="apiProvider" onchange="onProvChange()"><option value="deepseek">DeepSeek</option><option value="openai">OpenAI</option><option value="custom">自定义</option></select>
+<label>API Key</label><input type="password" id="apiKey" placeholder="sk-...">
+<label>Base URL</label><input type="text" id="apiBase" placeholder="https://api.deepseek.com">
+<label>模型</label><input type="text" id="modelName" placeholder="deepseek-chat">
+<div class="btn-row"><button class="btn-sec" onclick="closeModal('apiModal')">取消</button><button class="btn-pri" onclick="saveAPISettings()">💾保存</button></div>
+</div></div>
 
-    <div class="modal-overlay" id="socialModal"><div class="modal" style="width:95vw;max-width:500px;max-height:85vh" id="socialModalContent"></div></div>
+<div class="modal-overlay" id="socialModal"><div class="modal" style="width:95vw;max-width:500px;max-height:85vh" id="socialModalContent"></div></div>
+<div class="modal-overlay" id="editModal"><div class="modal"><h3>✏️ 编辑消息</h3><textarea id="editText" rows="4"></textarea><p style="font-size:10px;color:#a0a0b8;margin:4px 0">⚠️ 修改后将清除后续对话，AI重新回复</p><div class="btn-row"><button class="btn-sec" onclick="closeModal('editModal')">取消</button><button class="btn-pri" onclick="confirmEdit()">确认修改</button></div></div></div>
+<div class="modal-overlay" id="walletModal"><div class="modal"><h3>💰 钱包 & 物品</h3><div id="walletContent"></div></div></div>
+<div class="modal-overlay" id="docModal"><div class="modal"><h3>📄 文档规则管理</h3><div id="docContent"></div></div></div>
 
-    <!-- 手机壳 -->
-    <div class="phone-frame" id="phoneFrame">
-        <div class="phone-statusbar"><span id="phoneTime">21:03</span><span>📶 🔋85%</span></div>
-        <div class="phone-content">
+<!-- 手机壳 -->
+<div class="phone-frame" id="phoneFrame">
+<div class="phone-statusbar"><span id="phoneTime">21:03</span><span>📶 🔋85% | 💰<span id="walletBadge">50,000</span></span></div>
+<div class="phone-content">
 
-            <!-- 聊天页 -->
-            <div class="page active" id="page-chat">
-                <div class="sub-tabs"><button class="active" onclick="switchChatTab('offline')">🏠线下场景</button><button onclick="switchChatTab('wechat')">💬微信</button></div>
-                <div class="messages" id="chatMessages"></div>
-                <div class="wx-actions" id="wxActions"><button onclick="wxQuick('voice')">🎤</button><button onclick="wxQuick('image')">📷</button><button onclick="wxQuick('video')">📹</button><button onclick="wxQuick('call')">📞</button><button onclick="wxQuick('transfer')">💳</button><button onclick="wxQuick('moments')">🟢</button></div>
-                <div class="input-area" id="chatInputArea"><textarea id="userInput" rows="1" placeholder="输入云雾敛的台词/动作..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea><button class="btn-send" id="btnSend" onclick="sendMessage()">发送</button></div>
-            </div>
+<!-- 聊天页 -->
+<div class="page active" id="page-chat">
+<div class="sub-tabs"><button class="active" onclick="switchChatTab('offline')">🏠线下场景</button><button onclick="switchChatTab('wechat')">💬微信</button></div>
+<div class="wx-back" id="wxBack" onclick="showWxList()">← <span class="back-name" id="wxBackName">微信</span></div>
+<div class="messages" id="chatMessages"></div>
+<div class="wx-actions" id="wxActions"><button onclick="wxQuick('voice')">🎤</button><button onclick="wxQuick('image')">📷</button><button onclick="wxQuick('video')">📹</button><button onclick="wxQuick('call')">📞</button><button onclick="wxQuick('transfer')">💳</button><button onclick="wxQuick('moments')">🟢</button></div>
+<div class="input-area" id="chatInputArea"><textarea id="userInput" rows="1" placeholder="输入云雾敛的台词/动作..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea><button class="btn-send" id="btnSend" onclick="sendMessage()">发送</button></div>
+</div>
 
-            <!-- 发现页 -->
-            <div class="page" id="page-discover">
-                <div class="discover-grid">
-                    <div class="discover-card" onclick="openSocial('weibo')"><div class="ci">🧣</div><div class="cl">微博</div><div class="cs">粉丝实时讨论</div></div>
-                    <div class="discover-card" onclick="openSocial('twitter')"><div class="ci">🐦</div><div class="cl">Twitter/X</div><div class="cs">国际饭圈动态</div></div>
-                    <div class="discover-card" onclick="openSocial('instagram')"><div class="ci">📸</div><div class="cl">Instagram</div><div class="cs">Dispatch&饭拍</div></div>
-                    <div class="discover-card" onclick="openSocial('douban')"><div class="ci">📚</div><div class="cl">豆瓣</div><div class="cs">韩娱小组吃瓜</div></div>
-                    <div class="discover-card" onclick="openSocial('moments')"><div class="ci">🟢</div><div class="cl">朋友圈</div><div class="cs">好友动态</div></div>
-                </div>
-                <div id="socialFeedContainer" style="flex:1;overflow-y:auto"></div>
-            </div>
+<!-- 发现页 -->
+<div class="page" id="page-discover">
+<div class="discover-grid">
+<div class="discover-card" onclick="openSocial('weibo')"><div class="ci">🧣</div><div class="cl">微博</div><div class="cs">粉丝实时讨论</div></div>
+<div class="discover-card" onclick="openSocial('twitter')"><div class="ci">🐦</div><div class="cl">Twitter/X</div><div class="cs">国际饭圈动态</div></div>
+<div class="discover-card" onclick="openSocial('instagram')"><div class="ci">📸</div><div class="cl">Instagram</div><div class="cs">Dispatch&饭拍</div></div>
+<div class="discover-card" onclick="openSocial('douban')"><div class="ci">📚</div><div class="cl">豆瓣</div><div class="cs">韩娱小组吃瓜</div></div>
+<div class="discover-card" onclick="openSocial('moments')"><div class="ci">🟢</div><div class="cl">朋友圈</div><div class="cs">好友动态</div></div>
+<div class="discover-card" onclick="openPage('voting')"><div class="ci">🎵</div><div class="cl">打歌投票</div><div class="cs">实时排名&打榜</div></div>
+</div>
+<div id="socialFeedContainer" style="flex:1;overflow-y:auto"></div>
+</div>
 
-            <!-- 状态页 -->
-            <div class="page" id="page-stats" style="overflow-y:auto"><div style="padding:10px">
-                    <div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">📊关系状态</div><div class="stat-card" id="statsCard"></div>
-                    <div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px">🏷️触发标记</div><div class="stat-card" id="flagsCard"></div>
-                    <div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px">📌事件</div><div class="stat-card" id="eventsCard"></div>
-            </div></div>
+<!-- 打歌页 -->
+<div class="page" id="page-voting" style="overflow-y:auto">
+<div id="votingContent" style="padding:10px"></div>
+</div>
 
-            <!-- 设置页 -->
-            <div class="page" id="page-settings" style="overflow-y:auto"><div class="settings-section">
-                    <h4>🔌API配置</h4><button class="settings-btn" onclick="openModal('apiModal')">⚙️设置API Key和模型</button><div style="font-size:10px;margin:4px 0" id="apiStatus">未配置</div>
-                    <h4>🎨主题颜色</h4><div class="theme-options"><div class="theme-dot active" style="background:#0a0a0f" onclick="setTheme('dark')"></div><div class="theme-dot" style="background:#f5f5f7" onclick="setTheme('light')"></div><div class="theme-dot" style="background:#1a0a2e" onclick="setTheme('purple')"></div><div class="theme-dot" style="background:#0f0f1a" onclick="setTheme('blue')"></div></div>
-                    <h4>🔤字体大小</h4><div class="font-size-row"><button onclick="changeFontSize(-1)">A-</button><span class="fs-val" id="fsVal">14px</span><button onclick="changeFontSize(1)">A+</button><button onclick="resetFontSize()" style="border-radius:8px;width:auto;padding:6px 12px;font-size:11px">重置</button></div>
-                    <h4>💾数据管理</h4><button class="settings-btn" onclick="exportData()">📤导出数据备份</button><button class="settings-btn" onclick="document.getElementById('importFile').click()">📥导入数据备份</button><input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"><button class="settings-btn danger" onclick="resetAll()">🔄重置全部数据</button>
-                    <h4>📖文档</h4><button class="settings-btn" onclick="window.open('manual.html','_blank')">📖查看规则手册</button><button class="settings-btn" onclick="window.open('api.html','_blank')">📡查看API文档</button>
-                    <div style="font-size:9px;color:#888;text-align:center;margin-top:20px">📱韩娱嫂子模拟器 v5.0<br>Char:郁白·User:云雾敛</div>
-            </div></div>
-        </div>
-        <div class="bottom-nav">
-            <button class="active" onclick="switchPage('chat')"><span class="nav-icon">💬</span>聊天</button>
-            <button onclick="switchPage('discover')"><span class="nav-icon">🌐</span>发现<span class="badge-dot" id="discBadge" style="display:none"></span></button>
-            <button onclick="switchPage('stats')"><span class="nav-icon">📊</span>状态</button>
-            <button onclick="switchPage('settings')"><span class="nav-icon">⚙️</span>设置</button>
-        </div>
-    </div><script>
+<!-- 微信首页 -->
+<div class="page" id="page-wxlist" style="overflow-y:auto;background:var(--wechat-bg)">
+<div style="background:#ededed;padding:10px 14px;font-size:16px;font-weight:700;text-align:center;color:#111;border-bottom:1px solid #d9d9d9">💬 微信</div>
+<div id="wxListContainer"></div>
+</div>
+
+<!-- 状态页 -->
+<div class="page" id="page-stats" style="overflow-y:auto"><div style="padding:10px">
+<div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">📊关系状态</div><div class="stat-card" id="statsCard"></div>
+<div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px">🏷️触发标记</div><div class="stat-card" id="flagsCard"></div>
+<div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px">📌事件</div><div class="stat-card" id="eventsCard"></div>
+<div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px">🌍全局状态</div><div class="stat-card" id="globalStateCard"></div>
+</div></div>
+
+<!-- 设置页 -->
+<div class="page" id="page-settings" style="overflow-y:auto"><div class="settings-section">
+<h4>🔌API配置</h4><button class="settings-btn" onclick="openModal('apiModal')">⚙️设置API Key和模型</button><div style="font-size:10px;margin:4px 0" id="apiStatus">未配置</div>
+<h4>🎨主题 & 字体</h4><div class="settings-row"><span class="sr-label">字体大小</span><span><button class="mini-btn" onclick="changeFontSize(-1)">A-</button> <span id="fsVal" style="font-weight:700">14px</span> <button class="mini-btn" onclick="changeFontSize(1)">A+</button></span></div>
+<div class="settings-row"><span class="sr-label">主题</span><select onchange="setTheme(this.value)" style="width:auto"><option value="dark">深色</option><option value="light">浅色</option><option value="purple">紫色</option><option value="blue">蓝色</option></select></div>
+<h4>💰钱包设置</h4><div class="settings-row"><span class="sr-label">当前余额</span><span><input type="number" id="walletBalance" value="50000" style="width:100px" onchange="updateWalletFromSettings()"> ¥</span></div>
+<button class="settings-btn" onclick="openModal('walletModal')">📦管理物品列表</button>
+<h4>⏰Char主动消息</h4><div class="settings-row"><span class="sr-label">启用</span><label class="toggle-switch"><input type="checkbox" id="autoMsgToggle" onchange="toggleAutoMsg()"><span class="toggle-slider"></span></label></div>
+<div class="settings-row"><span class="sr-label">间隔(分钟)</span><select id="autoMsgInterval" onchange="updateAutoMsgInterval()"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option><option value="10">10</option><option value="30">30</option></select></div>
+<h4>📄文档规则</h4><button class="settings-btn" onclick="openModal('docModal')">📂管理文档规则</button>
+<button class="settings-btn" onclick="document.getElementById('docFileInput').click()">📤上传新规则文件(.json/.txt)</button><input type="file" id="docFileInput" accept=".json,.txt,.md" style="display:none" onchange="uploadDocFile(event)">
+<h4>💾数据管理</h4><button class="settings-btn" onclick="exportData()">📤导出数据备份</button><button class="settings-btn" onclick="document.getElementById('importFile').click()">📥导入数据备份</button><input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"><button class="settings-btn danger" onclick="resetAll()">🔄重置全部数据</button>
+<div style="font-size:9px;color:#888;text-align:center;margin-top:20px">📱韩娱嫂子模拟器 v6.0<br>Char:郁白·User:云雾敛</div>
+</div></div>
+
+</div>
+<div class="bottom-nav">
+<button class="active" onclick="switchPage('chat')"><span class="nav-icon">💬</span>聊天</button>
+<button onclick="switchPage('discover')"><span class="nav-icon">🌐</span>发现<span class="badge-dot" id="discBadge" style="display:none"></span></button>
+<button onclick="switchPage('stats')"><span class="nav-icon">📊</span>状态</button>
+<button onclick="switchPage('settings')"><span class="nav-icon">⚙️</span>设置</button>
+</div>
+</div><script>
 // ═══════════════════ 全局状态 ═══════════════════
 const S = {
     affection: 92, trust: 88, intimacy: 90, exposure: 25,
@@ -189,33 +235,59 @@ const S = {
     privacy: 'semi_public',
     flags: { dark: false, wangben: true, intimacy_scene: false },
     events: ['下周回归舞台彩排', 'Dispatch记者近期活跃于江南区'],
-    chatTab: 'offline', currentPage: 'chat',
-    conversationHistory: [], socialFeed: [], wxMessages: [], newSocialCount: 0,
-    fontSize: 14, theme: 'dark'
+    chatTab: 'offline', currentPage: 'chat', currentWxNpc: 'yubai',
+    conversationHistory: [], socialFeed: [], wxMessages: {},
+    newSocialCount: 0, fontSize: 14, theme: 'dark',
+    wallet: 50000, items: [],
+    autoMsgEnabled: false, autoMsgInterval: 3, autoMsgTimer: null,
+    globalState: {
+        lastMeeting: '签售会后台（刚刚结束）',
+        charLocation: '休息室',
+        userLocation: '休息室（助理身份）',
+        meetingStatus: 'together',
+        todayEvents: ['签售会', '晚間电台行程(21:00)'],
+        nextMeeting: '今晚电台结束后'
+    },
+    docs: [],
+    votingData: { songName: 'Moonlight', rank: 3, myVotes: 0, totalVotes: 284000, progress: 68 },
+    editingMsgIndex: -1, regeneratingMsgIndex: -1
 };
 
-// ═══════════════════ 主题 & 字体 ═══════════════════
-function setTheme(t) {
-    S.theme = t;
-    const frame = document.getElementById('phoneFrame');
-    frame.classList.remove('theme-light');
-    document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
-    if (t === 'light') { frame.classList.add('theme-light'); document.querySelectorAll('.theme-dot')[1].classList.add('active'); }
-    else if (t === 'dark') { document.querySelectorAll('.theme-dot')[0].classList.add('active'); }
-    else if (t === 'purple') { frame.style.setProperty('--bg', '#1a0a2e'); frame.style.setProperty('--surface', '#2a1a3e'); frame.style.setProperty('--surface2', '#1a1030'); frame.style.setProperty('--accent', '#e040fb'); frame.style.setProperty('--accent2', '#f48fb1'); frame.style.setProperty('--border', '#3a2050'); document.querySelectorAll('.theme-dot')[2].classList.add('active'); }
-    else if (t === 'blue') { frame.style.setProperty('--bg', '#0a0a1e'); frame.style.setProperty('--surface', '#101830'); frame.style.setProperty('--surface2', '#0f1428'); frame.style.setProperty('--accent', '#64b5f6'); frame.style.setProperty('--accent2', '#4fc3f7'); frame.style.setProperty('--border', '#1e3050'); document.querySelectorAll('.theme-dot')[3].classList.add('active'); }
-    localStorage.setItem('kpop_sim_theme', t);
-}
-function changeFontSize(d) { S.fontSize = Math.max(10, Math.min(22, S.fontSize + d)); document.documentElement.style.setProperty('--font-size', S.fontSize + 'px'); document.getElementById('fsVal').textContent = S.fontSize + 'px'; localStorage.setItem('kpop_sim_fontSize', S.fontSize); }
-function resetFontSize() { S.fontSize = 14; document.documentElement.style.setProperty('--font-size', '14px'); document.getElementById('fsVal').textContent = '14px'; localStorage.setItem('kpop_sim_fontSize', 14); }
+// ═══════════ 预设物品 ═══════════
+S.items = [
+    { name: '红底高跟鞋', price: 8800, icon: '👠', bought: false },
+    { name: '香奈儿包', price: 35000, icon: '👜', bought: true },
+    { name: '冰美式', price: 38, icon: '☕', bought: false },
+    { name: '专辑', price: 150, icon: '💿', bought: false },
+    { name: '签售名额', price: 2000, icon: '🎫', bought: false },
+    { name: 'Kiki零食', price: 85, icon: '🐱', bought: false },
+];
 
-// ═══════════════════ System Prompt ═══════════════════
+// ═══════════ 微信NPC列表 ═══════════
+const WX_NPCS = {
+    yubai: { name: '郁白', icon: '🎤', avatar: '🎤', role: 'char', prompt: '你是郁白，云雾敛的未婚夫。微信聊天风格：简短自然，1-3行。偶尔带占有欲但不油腻。用中文。', device: 'iPhone在线', ip: '韩国' },
+    jaehyun: { name: '金在允', icon: '🐶', avatar: '🐶', role: 'teammate', prompt: '你是金在允，郁白的队友。性格活泼八卦，爱开玩笑。你知道郁白和云雾敛的关系，帮忙打掩护。微信聊天风格：轻松随意，爱用emoji，偶尔透露郁白的动态。用中文。', device: 'iPhone在线', ip: '韩国' },
+    stylist: { name: '造型师Noona', icon: '💄', avatar: '💄', role: 'stylist', prompt: '你是郁白的造型师，30岁温柔姐姐。你知道郁白和云雾敛的关系但守口如瓶。微信风格：温柔细心，偶尔不经意透露郁白状态。用中文。', device: 'iPhone在线', ip: '韩国' },
+    tongdan: { name: '同担小群(3人)', icon: '📷', avatar: '📷', role: 'fangroup', prompt: '你是云雾敛的同担好友群。群里有3个追星姐妹。聊天风格：分享饭圈八卦、新物料、互相通风报信。用中文，偶尔用饭圈术语。', device: '群聊', ip: '浙江/北京/上海' },
+    mom: { name: '妈妈', icon: '👩', avatar: '👩', role: 'mom', prompt: '你是云雾敛的妈妈。关心女儿的生活，偶尔问"那个明星男朋友"怎么样了。说话温柔但唠叨。用中文。', device: 'iPhone在线', ip: '上海' },
+    dad: { name: '爸爸', icon: '👨', avatar: '👨', role: 'dad', prompt: '你是云雾敛的爸爸。话少，关心女儿工作和身体。不轻易表态但默默支持。偶尔转账。用中文。', device: 'Android在线', ip: '上海' },
+    yubai_mom: { name: '郁白妈妈', icon: '👩‍🦳', avatar: '👩‍🦳', role: 'yubai_mom', prompt: '你是郁白的妈妈，财阀夫人。优雅有礼，对云雾敛客气但还在考察中。偶尔关心两人相处情况。中韩双语，微信用中文。', device: 'iPhone在线', ip: '韩国' },
+};
+
+// ═══════════ 初始化每个NPC的对话历史 ═══════════
+Object.keys(WX_NPCS).forEach(key => {
+    if (!S.wxMessages[key]) S.wxMessages[key] = [];
+});
+
+// ═══════════ System Prompt ═══════════
 function buildSP() {
     return `你是郁白(Yu Bai)，韩国6人男团顶流偶像。中韩混血，192cm，23岁，天蝎座，财阀背景。
 
 【用户】云雾敛（緣緣），22岁，168cm。原为你的站姐Four.Y，现为未婚妻（已订婚），公开掩护身份为你的"私人生活助理"。在一起两年。
 
 【灯下黑规则】在粉丝媒体眼皮下恋爱，用"营业"包裹一切。她以"私人生活助理"身份在你身边。队友全知情打配合。
+
+【全局状态】${JSON.stringify(S.globalState)}
 
 【语言规则·全球翻译】
 - 公开场合（线下模式）：你说韩语，每句韩语后附【中文翻译】
@@ -238,8 +310,14 @@ function buildSP() {
 │ 💫亲密:_/100 📸曝光:_/100     │
 │ 🏷暗面:关 忘本:活跃 亲密:关   │
 │ 🌐新社交动态:(有/无)          │
+│ 📍全局:${S.globalState.meetingStatus}        │
 └────────────────────────────────┘
-若"🌐新社交动态:有"，末尾另起"🌐SOCIAL:"写1-2条社交媒体动态（微博/推特/INS/豆瓣风格，各≤80字）。`;
+若"🌐新社交动态:有"，末尾另起"🌐SOCIAL:"写1-2条社交媒体动态。`;
+}
+
+function buildNPCSP(npcKey) {
+    const npc = WX_NPCS[npcKey];
+    return `${npc.prompt}\n\n【当前全局状态】${JSON.stringify(S.globalState)}\n【好感度参考】郁白好感${S.affection}/100 曝光风险${S.exposure}/100\n【回复要求】简短自然，1-3行。直接回复即可。`;
 }
 
 const OPENING_OFFLINE = `他刚从签售会下来，耳返还挂在脖子上。休息室的门没关严，队友在外面和经纪人说话的声音隐约传进来。
@@ -258,79 +336,134 @@ const OPENING_OFFLINE = `他刚从签售会下来，耳返还挂在脖子上。�
 │ 💫亲密:90/100 📸曝光:25/100   │
 │ 🏷暗面:关 忘本:活跃 亲密:关   │
 │ 🌐新社交动态:无               │
+│ 📍全局:together               │
 └────────────────────────────────┘`;
 
-// ═══════════════════ 弹窗 ═══════════════════
+// ═══════════ 弹窗 ═══════════
 function openModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-document.getElementById('apiModal').addEventListener('click', function(e) { if (e.target === this) closeModal('apiModal'); });
-document.getElementById('socialModal').addEventListener('click', function(e) { if (e.target === this) closeModal('socialModal'); });
+['apiModal','socialModal','editModal','walletModal','docModal'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', function(e) { if (e.target === this) closeModal(id); });
+});
 
-// ═══════════════════ 页面切换 ═══════════════════
+// ═══════════ 页面切换 ═══════════
 function switchPage(p) {
     S.currentPage = p;
     document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-    document.getElementById('page-' + p).classList.add('active');
+    const targetPage = document.getElementById('page-' + p);
+    if (targetPage) targetPage.classList.add('active');
     document.querySelectorAll('.bottom-nav button').forEach((b, i) => {
         b.classList.remove('active');
-        if (['chat', 'discover', 'stats', 'settings'][i] === p) b.classList.add('active');
+        if (['chat','discover','stats','settings'][i] === p) b.classList.add('active');
     });
     if (p === 'discover') { S.newSocialCount = 0; updateDiscBadge(); renderSocialList(); }
-    if (p === 'stats') renderStats();
-    if (p === 'settings') { updateSettingsUI(); document.getElementById('fsVal').textContent = S.fontSize + 'px'; }
+    if (p === 'stats') { renderStats(); renderGlobalState(); }
+    if (p === 'settings') updateSettingsUI();
+    if (p === 'voting') renderVotingPage();
+}
+
+function openPage(p) {
+    S.currentPage = p;
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    const targetPage = document.getElementById('page-' + p);
+    if (targetPage) targetPage.classList.add('active');
+    if (p === 'voting') renderVotingPage();
 }
 
 function switchChatTab(tab) {
     S.chatTab = tab;
-    document.querySelectorAll('#page-chat .sub-tabs button').forEach((b, i) => b.classList.toggle('active', (i === 0 && tab === 'offline') || (i === 1 && tab === 'wechat')));
+    document.querySelectorAll('#page-chat .sub-tabs button').forEach((b, i) => b.classList.toggle('active', (i===0&&tab==='offline')||(i===1&&tab==='wechat')));
     const msgDiv = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
     const btnSend = document.getElementById('btnSend');
     const wxActions = document.getElementById('wxActions');
+    const wxBack = document.getElementById('wxBack');
     msgDiv.innerHTML = '';
     if (tab === 'wechat') {
-        msgDiv.classList.add('wx'); inputArea.classList.add('wx'); btnSend.classList.add('wx'); wxActions.classList.add('show');
+        msgDiv.classList.add('wx'); inputArea.classList.add('wx'); btnSend.classList.add('wx');
+        wxActions.classList.add('show'); wxBack.classList.add('show');
+        document.getElementById('wxBackName').textContent = WX_NPCS[S.currentWxNpc]?.name || '微信';
         document.getElementById('userInput').placeholder = '输入消息...';
-        S.wxMessages.forEach(m => addWxBubble(m));
+        (S.wxMessages[S.currentWxNpc] || []).forEach(m => addWxBubble(m, S.currentWxNpc));
     } else {
-        msgDiv.classList.remove('wx'); inputArea.classList.remove('wx'); btnSend.classList.remove('wx'); wxActions.classList.remove('show');
+        msgDiv.classList.remove('wx'); inputArea.classList.remove('wx'); btnSend.classList.remove('wx');
+        wxActions.classList.remove('show'); wxBack.classList.remove('show');
         document.getElementById('userInput').placeholder = '输入云雾敛的台词/动作...';
         renderOfflineMsgs();
     }
     msgDiv.scrollTop = msgDiv.scrollHeight;
 }
 
-// ═══════════════════ 渲染消息 ═══════════════════
+function showWxList() {
+    S.currentPage = 'wxlist';
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-wxlist').classList.add('active');
+    renderWxList();
+}
+
+function selectWxNpc(npcKey) {
+    S.currentWxNpc = npcKey;
+    S.currentPage = 'chat';
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-chat').classList.add('active');
+    switchChatTab('wechat');
+    document.getElementById('wxBackName').textContent = WX_NPCS[npcKey]?.name || '微信';
+}
+
+function renderWxList() {
+    const container = document.getElementById('wxListContainer');
+    const npcs = [
+        { key: 'yubai', preview: (S.wxMessages.yubai||[]).slice(-1)[0]?.text || '咖啡凉了。换一杯。', time: '刚刚' },
+        { key: 'jaehyun', preview: (S.wxMessages.jaehyun||[]).slice(-1)[0]?.text || '哥今天又偷懒了', time: '5分钟前' },
+        { key: 'stylist', preview: (S.wxMessages.stylist||[]).slice(-1)[0]?.text || '明天行程发你了', time: '1小时前' },
+        { key: 'tongdan', preview: (S.wxMessages.tongdan||[]).slice(-1)[0]?.text || '新物料看了吗！！', time: '30分钟前' },
+        { key: 'mom', preview: (S.wxMessages.mom||[]).slice(-1)[0]?.text || '这周末回来吃饭吗', time: '昨天' },
+        { key: 'yubai_mom', preview: (S.wxMessages.yubai_mom||[]).slice(-1)[0]?.text || '辛苦你了', time: '2天前' },
+        { key: 'dad', preview: (S.wxMessages.dad||[]).slice(-1)[0]?.text || '[转账]', time: '3天前' },
+    ];
+    container.innerHTML = npcs.map(n => `
+    <div class="wx-list-item" onclick="selectWxNpc('${n.key}')">
+        <div class="wl-avatar">${WX_NPCS[n.key].avatar}</div>
+        <div class="wl-info"><div class="wl-name">${WX_NPCS[n.key].name}</div><div class="wl-preview">${n.preview}</div></div>
+        <div class="wl-time">${n.time}</div>
+    </div>`).join('');
+}
+
+// ═══════════ 渲染消息 ═══════════
 function renderOfflineMsgs() {
-    S.conversationHistory.forEach(m => {
-        if (m.role === 'assistant' && !m._wx) { const c = cleanAI(m.content); if (c) addOffBubble('char', c); }
-        else if (m.role === 'user' && !m._wx) { const t = extractUser(m.content); if (t) addOffBubble('usr', t); }
+    S.conversationHistory.forEach((m, i) => {
+        if (m.role === 'assistant' && !m._wx) { const c = cleanAI(m.content); if (c) addOffBubble('char', c, i); }
+        else if (m.role === 'user' && !m._wx) { const t = extractUser(m.content); if (t) addOffBubble('usr', t, i); }
     });
 }
 
-function addOffBubble(role, text) {
+function addOffBubble(role, text, idx) {
     const div = document.getElementById('chatMessages');
     const b = document.createElement('div');
     b.className = 'msg ' + role;
-    b.innerHTML = `<div class="sender">${role==='usr'?'📷 云雾敛':'🎤 郁白'}</div><div class="body">${text}</div>`;
+    b.setAttribute('data-msg-index', idx ?? '');
+    b.innerHTML = `<div class="sender">${role==='usr'?'📷 云雾敛':'🎤 郁白'}</div><div class="body">${text}</div>
+    <div class="msg-actions">${role==='usr'?`<span onclick="editMessage(${idx})">✏️编辑</span>`:''}<span onclick="regenerateMessage(${idx})">🔄重新生成</span></div>`;
     div.appendChild(b); div.scrollTop = div.scrollHeight;
 }
 
 function extractUser(c) { const m = c.match(/云雾敛：(.+)$/s); return m ? m[1].trim() : c.replace(/【.*?】/g, '').trim(); }
 function cleanAI(t) { return t.replace(/┌──────────── STATUS ────────────┐[\s\S]*?└────────────────────────────────┘/, '').replace(/🌐SOCIAL:[\s\S]*$/, '').trim(); }
+function cleanStatusBlock(t) { return t.replace(/┌──────────── STATUS ────────────┐[\s\S]*?└────────────────────────────────┘/, '').trim(); }
 
-function addWxBubble(m) {
+function addWxBubble(m, npcKey) {
     const div = document.getElementById('chatMessages');
+    const isMe = m.role === 'user';
     const wrapper = document.createElement('div');
-    wrapper.className = 'wx-msg ' + (m.role === 'user' ? 'me' : 'you');
-    wrapper.style.alignSelf = m.role === 'user' ? 'flex-end' : 'flex-start';
+    wrapper.className = 'wx-msg ' + (isMe ? 'me' : 'you');
+    wrapper.style.alignSelf = isMe ? 'flex-end' : 'flex-start';
     let h = '';
     if (m.time) h += `<div style="text-align:center;margin:6px 0"><span class="wx-time">${m.time}</span></div>`;
-    if (m.role === 'assistant') h += `<div class="wx-header">🎤郁白·${m.device||'iPhone在线'}</div>`;
+    if (!isMe) h += `<div class="wx-header">${WX_NPCS[npcKey]?.icon||'🎤'}${WX_NPCS[npcKey]?.name||'郁白'}·${m.device||'iPhone在线'}</div>`;
     if (m.type === 'transfer') {
-        const colors = { pending: '#2EAA6E', paid: '#60D394', '收款': '#EB953A', received: '#F5CBA7', returned: '#F5CBA7' };
-        const labels = { pending: '待付款', paid: '✓已付款', '收款': '待收款', received: '√已接收', returned: '↺已退还' };
-        h += `<div class="wx-transfer-card" style="background:${colors[m.transferStatus]||'#2EAA6E'};">${labels[m.transferStatus]||'待付款'}<br><span style="font-size:20px;">¥${m.amount||0}</span><br><span style="font-size:9px;opacity:.7">微信转账</span></div>`;
+        const colors = { pending:'#2EAA6E', paid:'#60D394', '收款':'#EB953A', received:'#F5CBA7', returned:'#F5CBA7' };
+        const labels = { pending:'待付款', paid:'✓已付款', '收款':'待收款', received:'√已接收', returned:'↺已退还' };
+        h += `<div class="wx-transfer-card" style="background:${colors[m.transferStatus]||'#2EAA6E'};">${labels[m.transferStatus]||'待付款'}<br><span style="font-size:20px">¥${m.amount||0}</span><br><span style="font-size:9px;opacity:.7">微信转账</span></div>`;
     } else if (m.type === 'voice') {
         h += `<div class="wx-voice">🎤语音消息${m.duration||''}"<br><span style="font-size:10px;color:#999">转写：${m.text||''}</span></div>`;
     } else if (m.type === 'video') {
@@ -344,11 +477,12 @@ function addWxBubble(m) {
     }
     if (m.translation) h += `<div class="wx-trans">【${m.translation}】</div>`;
     if (m.ip) h += `<div class="wx-ip">🌐IP属地：${m.ip}</div>`;
+    h += `<div class="wx-msg-actions"><span onclick="regenerateWxMsg('${npcKey}',${(S.wxMessages[npcKey]||[]).indexOf(m)})">🔄重新生成</span></div>`;
     wrapper.innerHTML = h;
     div.appendChild(wrapper); div.scrollTop = div.scrollHeight;
 }
 
-// ═══════════════════ 发送消息 ═══════════════════
+// ═══════════ 发送消息 ═══════════
 async function sendMessage() {
     const settings = getAPISettings();
     if (!settings.apiKey) { openModal('apiModal'); showToast('⚠️请先设置API Key'); return; }
@@ -361,14 +495,17 @@ async function sendMessage() {
     const now = getNowTime();
 
     if (isWx) {
-        const wxMsg = { role: 'user', text: userText, time: now, device: 'iPhone在线', ip: '浙江', type: 'text' };
-        S.wxMessages.push(wxMsg); addWxBubble(wxMsg);
-        const ctx = `【微信聊天。好感${S.affection}/100 信任${S.trust}/100 亲密${S.intimacy}/100 曝光${S.exposure}/100。你是郁白，中韩混血，公开说韩语私下说中文。】\n\n云雾敛发来微信：${userText}`;
-        S.conversationHistory.push({ role: 'user', content: ctx, _wx: true });
+        const npcKey = S.currentWxNpc;
+        if (!S.wxMessages[npcKey]) S.wxMessages[npcKey] = [];
+        const wxMsg = { role:'user', text:userText, time:now, device:'iPhone在线', ip:npcKey==='yubai'?'浙江':'上海', type:'text' };
+        S.wxMessages[npcKey].push(wxMsg); addWxBubble(wxMsg, npcKey);
+        const npc = WX_NPCS[npcKey];
+        const ctx = `【微信聊天·对方是${npc.name}(${npc.role})。全局状态:${JSON.stringify(S.globalState)}。好感${S.affection}/100 曝光${S.exposure}/100】\n\n云雾敛发来微信：${userText}`;
+        S.conversationHistory.push({ role:'user', content:ctx, _wx:true, _npc:npcKey });
     } else {
-        addOffBubble('usr', userText);
-        const ctx = `【${S.location}。NPC：${S.npcs.join('、')}。隐私：${S.privacy}。好感${S.affection}/100 信任${S.trust}/100 亲密${S.intimacy}/100 曝光${S.exposure}/100。暗面：${S.flags.dark?'活跃':'关闭'} 忘本：${S.flags.wangben?'活跃':'关闭'}】\n\n云雾敛：${userText}`;
-        S.conversationHistory.push({ role: 'user', content: ctx, _wx: false });
+        addOffBubble('usr', userText, S.conversationHistory.length);
+        const ctx = `【${S.location}。NPC：${S.npcs.join('、')}。隐私：${S.privacy}。全局状态:${JSON.stringify(S.globalState)}。好感${S.affection}/100 信任${S.trust}/100 亲密${S.intimacy}/100 曝光${S.exposure}/100。暗面：${S.flags.dark?'活跃':'关闭'} 忘本：${S.flags.wangben?'活跃':'关闭'}】\n\n云雾敛：${userText}`;
+        S.conversationHistory.push({ role:'user', content:ctx, _wx:false });
     }
 
     if (S.conversationHistory.length > 60) { const sys = S.conversationHistory[0]; S.conversationHistory = [sys, ...S.conversationHistory.slice(-50)]; }
@@ -377,30 +514,45 @@ async function sendMessage() {
     document.getElementById('btnSend').disabled = true;
 
     try {
+        // 选择正确的prompt
+        let messages;
+        if (isWx && S.currentWxNpc !== 'yubai') {
+            messages = [{ role:'system', content:buildNPCSP(S.currentWxNpc) }];
+            const recentMsgs = (S.wxMessages[S.currentWxNpc] || []).slice(-10);
+            recentMsgs.forEach(m => {
+                messages.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text || '' });
+            });
+            messages.push({ role:'user', content: userText });
+        } else {
+            messages = [...S.conversationHistory];
+        }
+
         const resp = await fetch(settings.apiBase + '/chat/completions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + settings.apiKey },
-            body: JSON.stringify({ model: settings.model, messages: S.conversationHistory, temperature: 0.85, max_tokens: 2500 })
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+settings.apiKey},
+            body:JSON.stringify({ model:settings.model, messages, temperature:0.85, max_tokens:2500 })
         });
-        if (!resp.ok) { const e = await resp.json().catch(() => ({})); throw new Error(e.error?.message || `HTTP ${resp.status}`); }
+        if (!resp.ok) { const e = await resp.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${resp.status}`); }
         const data = await resp.json();
         const aiText = data.choices[0].message.content;
-        S.conversationHistory.push({ role: 'assistant', content: aiText, _wx: isWx });
+        S.conversationHistory.push({ role:'assistant', content:aiText, _wx:isWx, _npc:isWx?S.currentWxNpc:null });
         hideTyping();
         updateFromAI(aiText);
 
         if (isWx) {
             const replies = parseWxReply(aiText);
-            replies.forEach(r => { S.wxMessages.push(r); addWxBubble(r); });
-            if (Math.random() < 0.3) genRandomSocial();
+            const npcKey = S.currentWxNpc;
+            if (!S.wxMessages[npcKey]) S.wxMessages[npcKey] = [];
+            replies.forEach(r => { S.wxMessages[npcKey].push(r); addWxBubble(r, npcKey); });
+            if (npcKey === 'yubai' && Math.random() < 0.3) genRandomSocial();
         } else {
-            const c = cleanAI(aiText); if (c) addOffBubble('char', c);
+            const c = cleanAI(aiText); if (c) addOffBubble('char', c, S.conversationHistory.length-1);
             if (aiText.includes('🌐新社交动态:有') || Math.random() < 0.25) genRandomSocial();
         }
     } catch (err) {
         hideTyping();
-        if (isWx) { const em = { role: 'assistant', text: '⚠️' + err.message, time: now, type: 'system' }; S.wxMessages.push(em); addWxBubble(em); }
-        else addOffBubble('char', '⚠️出错：' + err.message);
+        if (isWx) { const em = { role:'assistant', text:'⚠️'+err.message, time:now, type:'system' }; if (!S.wxMessages[S.currentWxNpc]) S.wxMessages[S.currentWxNpc] = []; S.wxMessages[S.currentWxNpc].push(em); addWxBubble(em, S.currentWxNpc); }
+        else addOffBubble('char', '⚠️出错：'+err.message, -1);
         console.error(err);
     }
     document.getElementById('btnSend').disabled = false;
@@ -409,15 +561,127 @@ async function sendMessage() {
 
 function parseWxReply(aiText) {
     const replies = [];
-    const clean = aiText.replace(/┌──────────── STATUS ────────────┐[\s\S]*?└────────────────────────────────┘/, '').trim();
+    const clean = cleanStatusBlock(aiText);
     const lines = clean.split('\n').filter(l => l.trim());
     lines.forEach(line => {
         let text = line.trim(); let translation = '';
-        const tm = text.match(/【(.+?)】/); if (tm) { translation = tm[1]; text = text.replace(/【.+?】/, '').trim(); }
-        replies.push({ role: 'assistant', text: text || line, translation, time: getNowTime(), device: 'iPhone在线', ip: '韩国', type: 'text' });
+        const tm = text.match(/【(.+?)】/); if (tm) { translation = tm[1]; text = text.replace(/【.+?】/,'').trim(); }
+        replies.push({ role:'assistant', text:text||line, translation, time:getNowTime(), device:'iPhone在线', ip:'韩国', type:'text' });
     });
-    if (replies.length === 0) replies.push({ role: 'assistant', text: clean, time: getNowTime(), device: 'iPhone在线', ip: '韩国', type: 'text' });
+    if (replies.length === 0) replies.push({ role:'assistant', text:clean, time:getNowTime(), device:'iPhone在线', ip:'韩国', type:'text' });
     return replies;
+}
+
+// ═══════════ 重新生成 & 编辑 ═══════════
+function regenerateMessage(idx) {
+    if (!confirm('重新生成这条回复？备选版本将显示在原回复下方。')) return;
+    S.regeneratingMsgIndex = idx;
+    showToast('🔄正在重新生成...');
+    // 简化版：直接重新调API
+    const settings = getAPISettings();
+    if (!settings.apiKey) return;
+    const msgs = S.conversationHistory.slice(0, idx + 1);
+    fetch(settings.apiBase + '/chat/completions', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+settings.apiKey},
+        body:JSON.stringify({ model:settings.model, messages:msgs, temperature:1.0, max_tokens:2500 })
+    }).then(r => r.json()).then(data => {
+        const newText = data.choices[0].message.content;
+        showAltVersion(idx, newText);
+    }).catch(e => showToast('❌生成失败：'+e.message));
+}
+
+function showAltVersion(idx, newText) {
+    const msgDiv = document.getElementById('chatMessages');
+    const allMsgs = msgDiv.querySelectorAll('.msg');
+    const target = allMsgs[idx];
+    if (!target) return;
+    let altDiv = target.querySelector('.alt-versions');
+    if (!altDiv) {
+        altDiv = document.createElement('div');
+        altDiv.className = 'alt-versions';
+        target.appendChild(altDiv);
+    }
+    const altCount = altDiv.querySelectorAll('.alt-item').length + 1;
+    const altItem = document.createElement('div');
+    altItem.className = 'alt-item';
+    altItem.innerHTML = `📝备选版本${altCount}: ${cleanAI(newText).substring(0,100)}... <span style="color:var(--accent);cursor:pointer" onclick="selectAltVersion(${idx},${altCount-1})">[✅选这个]</span>`;
+    altItem.setAttribute('data-alt-text', newText);
+    altDiv.appendChild(altItem);
+    msgDiv.scrollTop = msgDiv.scrollHeight;
+}
+
+function selectAltVersion(idx, altIdx) {
+    const msgDiv = document.getElementById('chatMessages');
+    const allMsgs = msgDiv.querySelectorAll('.msg');
+    const target = allMsgs[idx];
+    if (!target) return;
+    const altItems = target.querySelectorAll('.alt-item');
+    const selected = altItems[altIdx];
+    if (!selected) return;
+    const newText = selected.getAttribute('data-alt-text');
+    // 更新对话历史
+    S.conversationHistory[idx] = { ...S.conversationHistory[idx], content: newText };
+    // 清除后续对话
+    S.conversationHistory = S.conversationHistory.slice(0, idx + 1);
+    // 更新显示
+    target.querySelector('.body').textContent = cleanAI(newText);
+    // 移除备选面板
+    const altDiv = target.querySelector('.alt-versions');
+    if (altDiv) altDiv.remove();
+    // 清除后续消息
+    const allMsgElements = Array.from(msgDiv.querySelectorAll('.msg'));
+    const targetIndex = allMsgElements.indexOf(target);
+    allMsgElements.slice(targetIndex + 1).forEach(el => el.remove());
+    updateFromAI(newText);
+    showToast('✅已选择此版本');
+}
+
+function editMessage(idx) {
+    const msg = S.conversationHistory[idx];
+    if (!msg || msg.role !== 'user') return;
+    S.editingMsgIndex = idx;
+    document.getElementById('editText').value = extractUser(msg.content);
+    openModal('editModal');
+}
+
+function confirmEdit() {
+    const newText = document.getElementById('editText').value.trim();
+    if (!newText) return;
+    const idx = S.editingMsgIndex;
+    const msg = S.conversationHistory[idx];
+    const isWx = msg._wx;
+    const prefix = isWx ? '云雾敛发来微信：' : '云雾敛：';
+    S.conversationHistory[idx] = { ...msg, content: msg.content.replace(/云雾敛.*$/, prefix + newText) };
+    S.conversationHistory = S.conversationHistory.slice(0, idx + 1);
+    closeModal('editModal');
+    // 重新渲染
+    const msgDiv = document.getElementById('chatMessages');
+    msgDiv.innerHTML = '';
+    renderOfflineMsgs();
+    showToast('✅消息已修改，后续对话已清除。请重新发送。');
+}
+
+function regenerateWxMsg(npcKey, msgIdx) {
+    if (!confirm('重新生成这条回复？')) return;
+    showToast('🔄正在重新生成...');
+    const settings = getAPISettings();
+    if (!settings.apiKey) return;
+    const npcMsgs = S.wxMessages[npcKey] || [];
+    const msgs = [{ role:'system', content:buildNPCSP(npcKey) }];
+    npcMsgs.slice(0, msgIdx + 1).forEach(m => msgs.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text || '' }));
+    fetch(settings.apiBase + '/chat/completions', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+settings.apiKey},
+        body:JSON.stringify({ model:settings.model, messages:msgs, temperature:1.0, max_tokens:1500 })
+    }).then(r => r.json()).then(data => {
+        const newText = data.choices[0].message.content;
+        S.wxMessages[npcKey][msgIdx] = { ...S.wxMessages[npcKey][msgIdx], text: newText };
+        // 重新渲染
+        document.getElementById('chatMessages').innerHTML = '';
+        (S.wxMessages[npcKey] || []).forEach(m => addWxBubble(m, npcKey));
+        showToast('✅已重新生成');
+    }).catch(e => showToast('❌生成失败：'+e.message));
 }
 
 function showTyping(wx) { const div = document.getElementById('chatMessages'); const el = document.createElement('div'); el.id = 'typingIndicator'; el.className = 'typing-dots'; if (wx) el.style.background = '#fff'; el.innerHTML = '<span></span><span></span><span></span>'; div.appendChild(el); div.scrollTop = div.scrollHeight; }
@@ -427,15 +691,14 @@ function getNowTime() { const n = new Date(); return `${String(n.getMonth()+1).p
 function wxQuick(action) {
     const input = document.getElementById('userInput');
     switch (action) { case 'voice': input.value = '[发了一条语音消息]'; break; case 'image': input.value = '[发了一张照片]'; break; case 'video': input.value = '[发起视频通话]'; break; case 'call': input.value = '[打电话]'; break; case 'transfer': input.value = '[转账500元]'; break; case 'moments': input.value = '[发朋友圈]'; break; }
-    sendMessage();
-}
-
-// ═══════════════════ 状态更新 ═══════════════════
+    sendMessage();// ═══════════════════ 状态更新 ═══════════════════
 function updateFromAI(text) {
     const sm = text.match(/💗好感:(\d+)\/100.*?🔒信任:(\d+)\/100.*?💫亲密:(\d+)\/100.*?📸曝光:(\d+)\/100/s);
     if (sm) { if (!isNaN(+sm[1])) S.affection = +sm[1]; if (!isNaN(+sm[2])) S.trust = +sm[2]; if (!isNaN(+sm[3])) S.intimacy = +sm[3]; if (!isNaN(+sm[4])) S.exposure = +sm[4]; }
     const dm = text.match(/暗面:(开|关)/), wm = text.match(/忘本:(活跃|关)/), im = text.match(/亲密:(开|关)/);
     if (dm) S.flags.dark = dm[1] === '开'; if (wm) S.flags.wangben = wm[1] === '活跃'; if (im) S.flags.intimacy_scene = im[1] === '开';
+    const gsm = text.match(/📍全局:(\w+)/);
+    if (gsm) S.globalState.meetingStatus = gsm[1];
 }
 
 function renderStats() {
@@ -449,6 +712,7 @@ function renderStats() {
 <div class="mini-bar"><div class="mini-bar-fill" style="width:${S.intimacy}%;background:#2ecc71"></div></div>
 <div class="stat-row"><span class="sl">📸曝光风险</span><span class="sv" style="color:#f39c12">${S.exposure}/100 ${S.exposure<20?'🟢':S.exposure<40?'🟡':S.exposure<60?'🟠':S.exposure<80?'🔴':'⚫'}</span></div>
 <div class="mini-bar"><div class="mini-bar-fill" style="width:${S.exposure}%;background:#f39c12"></div></div>
+<div class="stat-row"><span class="sl">💰钱包</span><span class="sv">¥${S.wallet.toLocaleString()}</span></div>
 <div class="stat-row"><span class="sl">📍位置</span><span class="sv">${S.location}</span></div>`;
     document.getElementById('flagsCard').innerHTML = `
 <div class="stat-row"><span>暗面</span><span class="tag ${S.flags.dark?'tag-on':'tag-off'}">${S.flags.dark?'活跃':'关闭'}</span></div>
@@ -456,29 +720,48 @@ function renderStats() {
 <div class="stat-row"><span>亲密场景</span><span class="tag ${S.flags.intimacy_scene?'tag-on':'tag-off'}">${S.flags.intimacy_scene?'活跃':'关闭'}</span></div>`;
     document.getElementById('eventsCard').innerHTML = S.events.map(e => `<div style="font-size:10px;color:var(--text2);padding:2px 0">•${e}</div>`).join('');
 }
-function updateSettingsUI() { const s = getAPISettings(); document.getElementById('apiStatus').textContent = s.apiKey ? '✅已配置(' + s.provider + ')' : '⚠️未配置-点击设置'; }
+
+function renderGlobalState() {
+    const gs = S.globalState;
+    document.getElementById('globalStateCard').innerHTML = `
+<div class="stat-row"><span class="sl">📅上次见面</span><span class="sv">${gs.lastMeeting}</span></div>
+<div class="stat-row"><span class="sl">🎤郁白位置</span><span class="sv">${gs.charLocation}</span></div>
+<div class="stat-row"><span class="sl">📷你的位置</span><span class="sv">${gs.userLocation}</span></div>
+<div class="stat-row"><span class="sl">🤝见面状态</span><span class="sv" style="color:${gs.meetingStatus==='together'?'#2ecc71':'#f39c12'}">${gs.meetingStatus==='together'?'在一起':'已分开'}</span></div>
+<div class="stat-row"><span class="sl">📌今日事件</span><span class="sv">${gs.todayEvents.join(', ')}</span></div>
+<div class="stat-row"><span class="sl">🔜下次见面</span><span class="sv">${gs.nextMeeting}</span></div>`;
+}
+
+function updateSettingsUI() {
+    const s = getAPISettings();
+    document.getElementById('apiStatus').textContent = s.apiKey ? '✅已配置(' + s.provider + ')' : '⚠️未配置-点击设置';
+    document.getElementById('fsVal').textContent = S.fontSize + 'px';
+    document.getElementById('walletBalance').value = S.wallet;
+    document.getElementById('autoMsgToggle').checked = S.autoMsgEnabled;
+    document.getElementById('autoMsgInterval').value = S.autoMsgInterval;
+}
 
 // ═══════════════════ 社交Feed ═══════════════════
 function initSocialFeed() {
     S.socialFeed = [
-        { id: 1, platform: '🧣微博', user: '郁白守护小队', handle: '@yubai_protect', avatar: '🛡️', body: '今天的签售会repo！哥哥状态好好😭那个新来的女助理怎么一直在他身边晃啊……不过看起来挺专业的，算了不狙了', time: '30分钟前', likes: 1200, comments: 204, shares: 89, liked: false },
-        { id: 2, platform: '🐦Twitter', user: 'YB Global Fanbase', handle: '@yubai_global', avatar: '🌏', body: 'Yu Bai at fansign today — look at this visual ✨ Our king is glowing! Also spotted a new female assistant following him closely.', time: '45分钟前', likes: 8400, comments: 356, shares: 1200, liked: false },
-        { id: 3, platform: '📸Instagram', user: 'dispatch_korea', handle: '@dispatch', avatar: '📰', body: 'Yu Bai leaving fansign venue. Spotted with 3 staff including one female assistant. Nothing suspicious — yet. 👀', time: '2小时前', likes: 23000, comments: 1800, shares: 0, liked: false },
-        { id: 4, platform: '🧣微博', user: '今天也骂嫂子', handle: '@hate_sister', avatar: '🤬', body: '姐妹们有没有人扒一下郁白身边那个新助理？长得还挺好看的……不会是……算了不贷款焦虑了', time: '1小时前', likes: 3200, comments: 567, shares: 120, liked: false },
-        { id: 5, platform: '📚豆瓣', user: '已注销', handle: '韩娱小组', avatar: '📚', body: '【讨论】郁白新助理什么来头？有没有人知道她是什么时候开始跟的？感觉最近出镜频率有点高……', time: '2小时前', likes: 892, comments: 345, shares: 0, liked: false, douban: true, group: '韩娱吃瓜基地', replies: [{ user: '吃瓜路人', text: '好像叫云雾敛？之前有人扒过' }, { user: '唯粉心碎', text: '别瞎猜了就是工作人员，别给哥哥造谣' }, { user: '清醒路人', text: '长得确实好看……助理颜值都能出道了' }] },
-        { id: 6, platform: '🟢朋友圈', user: '队友金在允', handle: '', avatar: '🐶', body: '今天签售结束后的后台。某人在偷吃零食被抓包了。有图但不给你们看🤫', time: '15分钟前', likes: 3, comments: 0, shares: 0, liked: false, moments: true }
+        { id:1, platform:'🧣微博', user:'郁白守护小队', handle:'@yubai_protect', avatar:'🛡️', body:'今天的签售会repo！哥哥状态好好😭那个新来的女助理怎么一直在他身边晃啊……不过看起来挺专业的，算了不狙了', time:'30分钟前', likes:1200, comments:204, shares:89, liked:false, replies:[{user:'追星少女',text:'助理不是一直都有吗？别太敏感了'},{user:'唯粉姐姐',text:'狙什么狙 做好自己就行'}] },
+        { id:2, platform:'🐦Twitter', user:'YB Global Fanbase', handle:'@yubai_global', avatar:'🌏', body:'Yu Bai at fansign today — look at this visual ✨ Our king is glowing! Also spotted a new female assistant following him closely.', time:'45分钟前', likes:8400, comments:356, shares:1200, liked:false, translated:false, replies:[{user:'intl_fan',text:'Probably just new staff. Stop overanalyzing everything!'},{user:'yb_protector',text:'He looks so handsome today 😭💜'}] },
+        { id:3, platform:'📸Instagram', user:'dispatch_korea', handle:'@dispatch', avatar:'📰', body:'Yu Bai leaving fansign venue. Spotted with 3 staff including one female assistant. Nothing suspicious — yet. 👀', time:'2小时前', likes:23000, comments:1800, shares:0, liked:false, replies:[{user:'kpop_fan',text:'Dispatch always watching 👀'},{user:'worried_fan',text:'Please leave him alone...'}] },
+        { id:4, platform:'🧣微博', user:'今天也骂嫂子', handle:'@hate_sister', avatar:'🤬', body:'姐妹们有没有人扒一下郁白身边那个新助理？长得还挺好看的……不会是……算了不贷款焦虑了', time:'1小时前', likes:3200, comments:567, shares:120, liked:false, replies:[{user:'吃瓜群众',text:'别瞎猜了 助理而已'},{user:'火眼金睛',text:'有一说一 那个助理确实有点好看……'}] },
+        { id:5, platform:'📚豆瓣', user:'已注销', handle:'韩娱小组', avatar:'📚', body:'【讨论】郁白新助理什么来头？有没有人知道她是什么时候开始跟的？感觉最近出镜频率有点高……', time:'2小时前', likes:892, comments:345, shares:0, liked:false, douban:true, group:'韩娱吃瓜基地', replies:[{user:'吃瓜路人',text:'好像叫云雾敛？之前有人扒过'},{user:'唯粉心碎',text:'别瞎猜了就是工作人员，别给哥哥造谣'},{user:'清醒路人',text:'长得确实好看……助理颜值都能出道了'},{user:'显微镜',text:'她一直跟着郁白 但是看起来挺专业的'}] },
+        { id:6, platform:'🟢朋友圈', user:'队友金在允', handle:'', avatar:'🐶', body:'今天签售结束后的后台。某人在偷吃零食被抓包了。有图但不给你们看🤫', time:'15分钟前', likes:3, comments:0, shares:0, liked:false, moments:true },
     ];
 }
 
 function genRandomSocial() {
     const posts = [
-        { platform: '🧣微博', user: '路人追星号', avatar: '👀', body: '在江南区偶遇郁白了……真人好高……旁边跟着一个女助理在帮他拿咖啡', time: '刚刚', likes: 892, comments: 132, shares: 45, liked: false },
-        { platform: '🐦Twitter', user: 'kpop_updates', avatar: '🔔', body: 'Rumor: Dispatch might drop their annual Jan 1 couple reveal early this year. Who will it be? 👀🍿', time: '刚刚', likes: 15000, comments: 2100, shares: 4200, liked: false },
-        { platform: '🧣微博', user: 'Four.Y更新了吗', avatar: '📷', body: 'Four.Y大大又半个月没更新了……站子还在但是基本不更图。大大是不是真的脱粉了😢', time: '刚刚', likes: 456, comments: 89, shares: 12, liked: false },
-        { platform: '📸Instagram', user: 'yubai_fanpage', avatar: '💜', body: 'New airport preview! Yu Bai spotted at Gimpo heading to... Shanghai? Our filial king 👑', time: '刚刚', likes: 5200, comments: 234, shares: 0, liked: false },
+        { platform:'🧣微博', user:'路人追星号', avatar:'👀', body:'在江南区偶遇郁白了……真人好高……旁边跟着一个女助理在帮他拿咖啡', time:'刚刚', likes:892, comments:132, shares:45, liked:false, replies:[] },
+        { platform:'🐦Twitter', user:'kpop_updates', avatar:'🔔', body:'Rumor: Dispatch might drop their annual Jan 1 couple reveal early this year. Who will it be? 👀🍿', time:'刚刚', likes:15000, comments:2100, shares:4200, liked:false, translated:false, replies:[] },
+        { platform:'🧣微博', user:'Four.Y更新了吗', avatar:'📷', body:'Four.Y大大又半个月没更新了……站子还在但是基本不更图。大大是不是真的脱粉了😢', time:'刚刚', likes:456, comments:89, shares:12, liked:false, replies:[{user:'同担姐妹',text:'我也好想念Four.Y的神图……'}] },
+        { platform:'📸Instagram', user:'yubai_fanpage', avatar:'💜', body:'New airport preview! Yu Bai spotted at Gimpo heading to... Shanghai? Our filial king 👑', time:'刚刚', likes:5200, comments:234, shares:0, liked:false, replies:[] },
     ];
     const p = posts[Math.floor(Math.random() * posts.length)];
-    S.socialFeed.unshift({ ...p, id: Date.now(), isNew: true });
+    S.socialFeed.unshift({...p, id:Date.now(), isNew:true});
     if (S.socialFeed.length > 30) S.socialFeed = S.socialFeed.slice(0, 30);
     S.newSocialCount++; updateDiscBadge();
     setTimeout(() => { p.isNew = false; updateDiscBadge(); }, 5000);
@@ -486,113 +769,408 @@ function genRandomSocial() {
 
 function updateDiscBadge() { document.getElementById('discBadge').style.display = (S.newSocialCount > 0 && S.currentPage !== 'discover') ? 'block' : 'none'; }
 
-function handleLike(id) {
-    const post = S.socialFeed.find(p => p.id === id);
-    if (!post) return;
-    post.liked = !post.liked;
-    post.likes += post.liked ? 1 : -1;
-    renderSocialList();
-}
+function handleLike(id) { const post = S.socialFeed.find(p => p.id === id); if (!post) return; post.liked = !post.liked; post.likes += post.liked ? 1 : -1; renderSocialList(); }
+function handleComment(id) { const post = S.socialFeed.find(p => p.id === id); if (!post) return; const txt = prompt('输入评论：'); if (!txt) return; if (!post.replies) post.replies = []; post.replies.push({user:'云雾敛',text:txt}); post.comments = (post.comments||0) + 1; renderSocialList(); }
+function handleShare(id) { const post = S.socialFeed.find(p => p.id === id); if (!post) return; post.shares = (post.shares||0) + 1; showToast('🔗已转发'); renderSocialList(); }
+function translatePost(id) { const post = S.socialFeed.find(p => p.id === id); if (!post) return; if (post.translated) { post.translated = false; showToast('已恢复原文'); } else { post.translatedBody = '【翻译】郁白今日签售会——看看这视觉效果✨我们的国王在发光！还发现一名新的女助理紧随其后。'; post.translated = true; showToast('🌐已翻译'); } renderSocialList(); }
 
-function handleComment(id) {
-    const post = S.socialFeed.find(p => p.id === id);
-    if (!post) return;
-    const txt = prompt('输入评论：');
-    if (!txt) return;
-    if (!post.replies) post.replies = [];
-    post.replies.push({ user: '云雾敛', text: txt });
-    post.comments = (post.comments || 0) + 1;
-    renderSocialList();
-}
-
-function handleShare(id) {
-    const post = S.socialFeed.find(p => p.id === id);
-    if (!post) return;
-    post.shares = (post.shares || 0) + 1;
-    showToast('🔗已转发');
-    renderSocialList();
-}
-
-function formatNum(n) { if (n >= 10000) return (n / 1000).toFixed(1) + 'k'; if (n >= 1000) return (n / 1000).toFixed(1) + 'k'; return n.toString(); }
+function formatNum(n) { if (!n) return '0'; if (n >= 10000) return (n/1000).toFixed(1)+'k'; if (n >= 1000) return (n/1000).toFixed(1)+'k'; return n.toString(); }
 
 function renderSocialList() {
     const container = document.getElementById('socialFeedContainer');
     if (!S.socialFeed.length) { container.innerHTML = '<div style="text-align:center;color:var(--text2);padding:20px">暂无动态</div>'; return; }
     container.innerHTML = S.socialFeed.map(p => `
-<div class="social-post${p.isNew?' new':''}">
+<div class="social-post${p.isNew?' new':''}" onclick="openPostDetail(${p.id})">
 <div class="ph"><div class="pa">${p.avatar}</div><div><div class="pu">${p.user}</div><div class="phn">${p.handle||''}</div></div><div class="pp">${p.platform}</div></div>
 ${p.douban&&p.group?`<div style="font-size:9px;color:#6ba346;margin-bottom:4px">📚${p.group}</div>`:''}
-<div class="pb">${p.body}</div>
-${p.douban&&p.replies?`<div style="background:var(--surface2);border-radius:6px;padding:8px;margin:6px 0">${p.replies.map(r=>`<div style="padding:3px 0;font-size:10px;border-bottom:1px solid var(--border)"><span style="color:#6ba346;font-weight:600">${r.user}</span>: ${r.text}</div>`).join('')}</div>`:''}
+<div class="pb">${p.translated?p.translatedBody:p.body}${p.platform.includes('Twitter')&&!p.translated?`<span class="translate-btn" onclick="event.stopPropagation();translatePost(${p.id})">🌐翻译</span>`:''}</div>
+${p.replies&&p.replies.length>0?`<div style="background:var(--surface2);border-radius:6px;padding:6px;margin:4px 0;font-size:10px;color:var(--text2)">💬${p.replies.slice(-2).map(r=>`<div>${r.user}: ${r.text.substring(0,40)}...</div>`).join('')}</div>`:''}
 <div class="pst">
-<span onclick="handleLike(${p.id})" class="${p.liked?'liked':''}">❤️${formatNum(p.likes)}</span>
-<span onclick="handleComment(${p.id})">💬${formatNum(p.comments||0)}</span>
-<span onclick="handleShare(${p.id})">🔄${formatNum(p.shares||0)}</span>
+<span onclick="event.stopPropagation();handleLike(${p.id})" class="${p.liked?'liked':''}">❤️${formatNum(p.likes)}</span>
+<span onclick="event.stopPropagation();handleComment(${p.id})">💬${formatNum(p.comments||0)}</span>
+<span onclick="event.stopPropagation();handleShare(${p.id})">🔄${formatNum(p.shares||0)}</span>
 </div>
 <div class="pti">${p.time}</div>
 </div>`).join('');
 }
 
+function openPostDetail(id) {
+    const post = S.socialFeed.find(p => p.id === id);
+    if (!post) return;
+    const content = document.getElementById('socialModalContent');
+    let html = `<h3>${post.platform} · ${post.user}</h3>`;
+    html += `<div style="background:#12121a;border-radius:8px;padding:12px;margin:8px 0;font-size:12px;line-height:1.6;color:#d4d4dc">${post.translated?post.translatedBody:post.body}</div>`;
+    html += `<div style="display:flex;gap:16px;font-size:11px;color:#a0a0b8;margin:8px 0;padding-bottom:8px;border-bottom:1px solid #252540"><span>❤️${formatNum(post.likes)}</span><span>💬${formatNum(post.comments||0)}</span><span>🔄${formatNum(post.shares||0)}</span><span style="margin-left:auto;font-size:9px;color:#888">${post.time}</span></div>`;
+    html += '<div style="font-size:11px;color:#c9a0dc;font-weight:700;margin:8px 0">💬 评论</div>';
+    if (post.replies && post.replies.length > 0) {
+        post.replies.forEach(r => {
+            html += `<div style="background:#12121a;border-radius:6px;padding:8px;margin:4px 0;font-size:11px;color:#d4d4dc"><span style="color:#6ba346;font-weight:600">${r.user}</span>: ${r.text}</div>`;
+        });
+    } else {
+        html += '<div style="color:#a0a0b8;font-size:11px;text-align:center;padding:12px">暂无评论</div>';
+    }
+    html += `<div style="margin-top:10px"><input id="detailCommentInput" style="width:100%;background:#0a0a0f;border:1px solid #333;border-radius:8px;padding:8px;color:#d4d4dc;font-size:12px" placeholder="写评论..."><button style="margin-top:6px;background:#c9a0dc;border:none;color:#000;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px" onclick="addDetailComment(${id})">发送</button></div>`;
+    content.innerHTML = html;
+    openModal('socialModal');
+}
+
+function addDetailComment(id) {
+    const post = S.socialFeed.find(p => p.id === id);
+    if (!post) return;
+    const input = document.getElementById('detailCommentInput');
+    const txt = input?.value?.trim();
+    if (!txt) return;
+    if (!post.replies) post.replies = [];
+    post.replies.push({user:'云雾敛',text:txt});
+    post.comments = (post.comments||0) + 1;
+    input.value = '';
+    openPostDetail(id);
+    renderSocialList();
+}
+
 function openSocial(platform) {
     const content = document.getElementById('socialModalContent');
     const filtered = S.socialFeed.filter(p => {
-        if (platform === 'weibo') return p.platform.includes('微博');
-        if (platform === 'twitter') return p.platform.includes('Twitter');
-        if (platform === 'instagram') return p.platform.includes('Instagram');
-        if (platform === 'douban') return p.platform.includes('豆瓣');
-        if (platform === 'moments') return p.platform.includes('朋友圈');
+        if (platform==='weibo') return p.platform.includes('微博');
+        if (platform==='twitter') return p.platform.includes('Twitter');
+        if (platform==='instagram') return p.platform.includes('Instagram');
+        if (platform==='douban') return p.platform.includes('豆瓣');
+        if (platform==='moments') return p.platform.includes('朋友圈');
         return true;
     });
     let html = `<h3>${platform==='weibo'?'🧣微博':platform==='twitter'?'🐦Twitter':platform==='instagram'?'📸Instagram':platform==='douban'?'📚豆瓣':'🟢朋友圈'}实时动态</h3>`;
     if (!filtered.length) { html += '<p style="color:#a0a0b8">暂无动态</p>'; }
     else {
         filtered.forEach(p => {
-            html += `<div style="background:#1a1a28;border:1px solid #333;border-radius:8px;padding:10px;margin:6px 0;font-size:11px;${p.isNew?'border-left:2px solid #c9a0dc':''}">
-<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:18px">${p.avatar}</span><span style="font-weight:700;color:#fff">${p.user}</span><span style="font-size:9px;color:#a0a0b8">${p.handle||''}</span><span style="margin-left:auto;font-size:9px;color:#c9a0dc">${p.platform}</span></div>`;
-            if (p.douban && p.group) html += `<div style="font-size:9px;color:#6ba346;margin-bottom:4px">📚${p.group}</div>`;
-            html += `<div style="line-height:1.5;color:#d4d4dc">${p.body}</div>`;
-            if (p.douban && p.replies) { html += '<div style="background:#12121a;border-radius:6px;padding:8px;margin-top:6px">'; p.replies.forEach(r => { html += `<div style="padding:3px 0;font-size:10px;border-bottom:1px solid #252540"><span style="color:#6ba346;font-weight:600">${r.user}</span>: ${r.text}</div>`; }); html += '</div>'; }
-            html += `<div style="display:flex;gap:14px;font-size:10px;color:#a0a0b8;margin-top:6px;padding-top:6px;border-top:1px solid #252540"><span style="cursor:pointer" onclick="event.stopPropagation();handleLike(${p.id})">❤️${formatNum(p.likes)}</span><span style="cursor:pointer" onclick="event.stopPropagation();handleComment(${p.id})">💬${formatNum(p.comments||0)}</span><span style="cursor:pointer" onclick="event.stopPropagation();handleShare(${p.id})">🔄${formatNum(p.shares||0)}</span></div>
-<div style="font-size:9px;color:#888;margin-top:4px">${p.time}</div></div>`;
+            html += `<div style="background:#1a1a28;border:1px solid #333;border-radius:8px;padding:10px;margin:6px 0;font-size:11px;${p.isNew?'border-left:2px solid #c9a0dc':''}" onclick="event.stopPropagation();openPostDetail(${p.id})">
+<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:18px">${p.avatar}</span><span style="font-weight:700;color:#fff">${p.user}</span><span style="font-size:9px;color:#a0a0b8">${p.handle||''}</span><span style="margin-left:auto;font-size:9px;color:#c9a0dc">${p.platform}</span></div>
+<div style="line-height:1.5;color:#d4d4dc">${p.translated?p.translatedBody:p.body}</div>
+<div style="display:flex;gap:14px;font-size:10px;color:#a0a0b8;margin-top:6px;padding-top:6px;border-top:1px solid #252540"><span>❤️${formatNum(p.likes)}</span><span>💬${formatNum(p.comments||0)}</span><span>🔄${formatNum(p.shares||0)}</span></div>
+</div>`;
         });
     }
     content.innerHTML = html;
     openModal('socialModal');
 }
 
+// ═══════════════════ 打歌系统 ═══════════════════
+function renderVotingPage() {
+    const container = document.getElementById('votingContent');
+    const v = S.votingData;
+    const rankEmoji = v.rank === 1 ? '🥇' : v.rank === 2 ? '🥈' : v.rank === 3 ? '🥉' : '📊';
+    container.innerHTML = `
+<div style="text-align:center;padding:16px">
+    <div style="font-size:40px">${rankEmoji}</div>
+    <div style="font-size:18px;font-weight:700;color:var(--text)">🎵 ${v.songName}</div>
+    <div style="font-size:12px;color:var(--accent)">郁白所在团体 · 本次回归主打</div>
+    <div style="font-size:36px;font-weight:800;color:var(--accent);margin:12px 0">实时排名 #${v.rank}</div>
+    <div class="mini-bar" style="margin:8px 20px"><div class="mini-bar-fill" style="width:${v.progress}%;background:linear-gradient(90deg,#c9a0dc,#e8b4b8)"></div></div>
+    <div style="font-size:11px;color:var(--text2)">打榜进度 ${v.progress}% · 总票数 ${v.totalVotes.toLocaleString()}</div>
+</div>
+<div class="stat-card">
+    <div class="stat-row"><span class="sl">🗳️ 我的投票</span><span class="sv" style="color:#2ecc71">${v.myVotes} 票</span></div>
+    <div class="stat-row"><span class="sl">💿 可购专辑</span><span class="sv">¥150/张 (含10票)</span></div>
+    <div class="stat-row"><span class="sl">📱 投票券</span><span class="sv">¥10/张 (含1票)</span></div>
+    <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn-pri" onclick="buyVote('album')" style="flex:1;padding:10px">💿购专辑 ¥150</button>
+        <button class="btn-pri" onclick="buyVote('ticket')" style="flex:1;padding:10px">📱投票券 ¥10</button>
+    </div>
+</div>
+<div class="stat-card" style="margin-top:10px">
+    <div style="font-size:11px;color:var(--accent);font-weight:700;margin-bottom:6px">🏆 实时音源排名</div>
+    ${['Melon','Genie','Bugs','FLO','VIBE'].map((platform,i) => `
+    <div class="stat-row"><span class="sl">${platform}</span><span class="sv">#${Math.max(1,v.rank-1+Math.floor(Math.random()*3))}</span></div>`).join('')}
+</div>
+<div style="font-size:9px;color:#888;text-align:center;margin-top:12px">💡 投票花费从钱包扣除 · 排名每小时更新</div>`;
+}
+
+function buyVote(type) {
+    const cost = type === 'album' ? 150 : 10;
+    const votes = type === 'album' ? 10 : 1;
+    if (S.wallet < cost) { showToast('💰余额不足！请充值'); return; }
+    S.wallet -= cost;
+    S.votingData.myVotes += votes;
+    S.votingData.totalVotes += votes;
+    S.votingData.progress = Math.min(100, Math.round((S.votingData.totalVotes / 300000) * 100));
+    if (S.votingData.totalVotes >= 300000) S.votingData.rank = Math.max(1, S.votingData.rank - 1);
+    document.getElementById('walletBadge').textContent = S.wallet.toLocaleString();
+    renderVotingPage();
+    showToast(`✅已购买${type==='album'?'专辑':'投票券'}！+${votes}票`);
+    if (Math.random() < 0.4) {
+        setTimeout(() => {
+            showToast('😏刷到自己以前发的打榜微博："哥哥必须一位！姐妹们冲啊！"');
+        }, 1500);
+    }
+}
+
+// ═══════════════════ 钱包 ═══════════════════
+function updateWalletFromSettings() {
+    S.wallet = parseInt(document.getElementById('walletBalance').value) || 0;
+    document.getElementById('walletBadge').textContent = S.wallet.toLocaleString();
+    localStorage.setItem('kpop_sim_wallet', S.wallet);
+}
+
+function renderWalletModal() {
+    const content = document.getElementById('walletContent');
+    let html = `<h3>💰 钱包管理</h3><div class="stat-row"><span class="sl">当前余额</span><span class="sv" style="color:#2ecc71">¥${S.wallet.toLocaleString()}</span></div>`;
+    html += '<div style="font-size:11px;color:#c9a0dc;font-weight:700;margin:12px 0 4px">📦 物品列表</div>';
+    S.items.forEach((item, i) => {
+        html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #333;font-size:11px">
+            <span>${item.icon} ${item.name} · ¥${item.price.toLocaleString()} ${item.bought?'✅已拥有':''}</span>
+            <span><button class="mini-btn" onclick="buyItem(${i})" ${item.bought||S.wallet<item.price?'disabled':''}>购买</button>
+            <button class="mini-btn danger" onclick="removeItem(${i})">删除</button></span></div>`;
+    });
+    html += '<div style="margin-top:10px;font-size:11px;color:#c9a0dc;font-weight:700">➕添加物品</div>';
+    html += '<input id="newItemName" placeholder="名称"><input id="newItemPrice" placeholder="价格" type="number"><input id="newItemIcon" placeholder="图标emoji" maxlength="2">';
+    html += '<button class="btn-pri" style="width:100%;margin-top:6px" onclick="addCustomItem()">添加</button>';
+    content.innerHTML = html;
+}
+
+function buyItem(i) {
+    if (S.wallet < S.items[i].price) { showToast('💰余额不足'); return; }
+    S.wallet -= S.items[i].price;
+    S.items[i].bought = true;
+    document.getElementById('walletBadge').textContent = S.wallet.toLocaleString();
+    renderWalletModal();
+    showToast(`✅已购买 ${S.items[i].icon}${S.items[i].name}！`);
+}
+
+function removeItem(i) {
+    if (!confirm(`删除物品"${S.items[i].name}"？`)) return;
+    S.items.splice(i, 1);
+    renderWalletModal();
+}
+
+function addCustomItem() {
+    const name = document.getElementById('newItemName').value.trim();
+    const price = parseInt(document.getElementById('newItemPrice').value) || 0;
+    const icon = document.getElementById('newItemIcon').value.trim() || '📦';
+    if (!name || price <= 0) { showToast('请填写名称和价格'); return; }
+    S.items.push({ name, price, icon, bought: false });
+    renderWalletModal();
+    showToast('✅物品已添加');
+}
+
+// ═══════════════════ 文档规则管理 ═══════════════════
+function renderDocModal() {
+    const content = document.getElementById('docContent');
+    let html = '<h3>📄 文档规则管理</h3>';
+    if (S.docs.length === 0) {
+        html += '<p style="color:#a0a0b8;font-size:11px">暂无文档规则。系统默认规则已在运行。</p>';
+    } else {
+        S.docs.forEach((doc, i) => {
+            html += `<div class="setting-doc-item">
+                <span><span class="doc-name">📄 ${doc.name}</span><br><span class="doc-status">${doc.size} · ${doc.addedAt}</span></span>
+                <span><button class="mini-btn" onclick="viewDoc(${i})">查看</button>
+                <button class="mini-btn" onclick="toggleDoc(${i})">${doc.active?'启用中':'已禁用'}</button>
+                <button class="mini-btn danger" onclick="deleteDoc(${i})">删除</button></span></div>`;
+        });
+    }
+    html += '<div style="font-size:10px;color:#a0a0b8;margin-top:10px">💡 支持的文档类型：.json / .txt / .md<br>上传后可在设置中启用或禁用</div>';
+    content.innerHTML = html;
+}
+
+function uploadDocFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        S.docs.push({
+            name: file.name,
+            size: (file.size/1024).toFixed(1)+'KB',
+            addedAt: new Date().toLocaleDateString(),
+            content: content,
+            active: true
+        });
+        showToast('✅文档已上传：'+file.name);
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function viewDoc(i) {
+    const doc = S.docs[i];
+    alert('📄 '+doc.name+'\n\n'+doc.content.substring(0,2000)+(doc.content.length>2000?'\n\n...(内容过长，已截断)':''));
+}
+
+function toggleDoc(i) {
+    S.docs[i].active = !S.docs[i].active;
+    renderDocModal();
+    showToast(S.docs[i].active?'✅已启用':'⛔已禁用');
+}
+
+function deleteDoc(i) {
+    if (!confirm(`删除文档"${S.docs[i].name}"？`)) return;
+    S.docs.splice(i, 1);
+    renderDocModal();
+    showToast('🗑️已删除');
+}
+
+function getActiveDocsContent() {
+    return S.docs.filter(d => d.active).map(d => d.content).join('\n\n---\n\n');
+}
+
+// ═══════════════════ Char主动消息 ═══════════════════
+function toggleAutoMsg() {
+    S.autoMsgEnabled = document.getElementById('autoMsgToggle').checked;
+    if (S.autoMsgEnabled) startAutoMsg();
+    else stopAutoMsg();
+}
+
+function updateAutoMsgInterval() {
+    S.autoMsgInterval = parseInt(document.getElementById('autoMsgInterval').value);
+    if (S.autoMsgEnabled) { stopAutoMsg(); startAutoMsg(); }
+}
+
+function startAutoMsg() {
+    if (S.autoMsgTimer) clearInterval(S.autoMsgTimer);
+    S.autoMsgTimer = setInterval(autoSendCharMsg, S.autoMsgInterval * 60000);
+    showToast('⏰Char主动消息已开启（每'+S.autoMsgInterval+'分钟）');
+}
+
+function stopAutoMsg() {
+    if (S.autoMsgTimer) { clearInterval(S.autoMsgTimer); S.autoMsgTimer = null; }
+}
+
+async function autoSendCharMsg() {
+    if (S.chatTab !== 'wechat' || S.currentWxNpc !== 'yubai') return;
+    if (S.globalState.meetingStatus === 'together') return;
+    
+    const triggers = ['刚结束行程，想你了','看到好玩的东西分享给你','Kiki又捣乱了','有点吃醋了','发了一张照片','问你在干嘛','提醒你吃饭','分享了一首歌'];
+    const trigger = triggers[Math.floor(Math.random() * triggers.length)];
+    
+    const settings = getAPISettings();
+    if (!settings.apiKey) return;
+
+    const ctx = `【主动发消息·触发原因:${trigger}。全局状态:${JSON.stringify(S.globalState)}。简短自然，1-2行。】`;
+
+    try {
+        const resp = await fetch(settings.apiBase + '/chat/completions', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+settings.apiKey},
+            body:JSON.stringify({ model:settings.model, messages:[{role:'system',content:buildSP()},{role:'user',content:ctx}], temperature:0.9, max_tokens:500 })
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const aiText = data.choices[0].message.content;
+        const replies = parseWxReply(aiText);
+        if (!S.wxMessages['yubai']) S.wxMessages['yubai'] = [];
+        replies.forEach(r => { S.wxMessages['yubai'].push(r); });
+        if (S.currentPage === 'chat' && S.chatTab === 'wechat' && S.currentWxNpc === 'yubai') {
+            replies.forEach(r => addWxBubble(r, 'yubai'));
+        }
+        S.newSocialCount++;
+        updateDiscBadge();
+    } catch(e) { console.error('Auto msg failed:', e); }
+}
+
+// ═══════════════════ 主题 & 字体 ═══════════════════
+function setTheme(t) {
+    S.theme = t;
+    const frame = document.getElementById('phoneFrame');
+    frame.classList.remove('theme-light');
+    if (t==='light') frame.classList.add('theme-light');
+    else if (t==='purple') { frame.style.setProperty('--bg','#1a0a2e'); frame.style.setProperty('--surface','#2a1a3e'); frame.style.setProperty('--surface2','#1a1030'); frame.style.setProperty('--accent','#e040fb'); frame.style.setProperty('--accent2','#f48fb1'); frame.style.setProperty('--border','#3a2050'); }
+    else if (t==='blue') { frame.style.setProperty('--bg','#0a0a1e'); frame.style.setProperty('--surface','#101830'); frame.style.setProperty('--surface2','#0f1428'); frame.style.setProperty('--accent','#64b5f6'); frame.style.setProperty('--accent2','#4fc3f7'); frame.style.setProperty('--border','#1e3050'); }
+    localStorage.setItem('kpop_sim_theme', t);
+}
+function changeFontSize(d) { S.fontSize = Math.max(10, Math.min(22, S.fontSize + d)); document.documentElement.style.setProperty('--font-size', S.fontSize + 'px'); document.getElementById('fsVal').textContent = S.fontSize + 'px'; localStorage.setItem('kpop_sim_fontSize', S.fontSize); }
+
 // ═══════════════════ API设置 ═══════════════════
-function getAPISettings() { const s = localStorage.getItem('kpop_sim_v5_settings'); if (s) return JSON.parse(s); return { provider: 'deepseek', apiKey: '', apiBase: 'https://api.deepseek.com', model: 'deepseek-chat' }; }
-function saveAPISettingsToStorage(s) { localStorage.setItem('kpop_sim_v5_settings', JSON.stringify(s)); }
-function onProvChange() { const p = document.getElementById('apiProvider').value; if (p === 'deepseek') { document.getElementById('apiBase').value = 'https://api.deepseek.com'; document.getElementById('modelName').value = 'deepseek-chat'; } else if (p === 'openai') { document.getElementById('apiBase').value = 'https://api.openai.com/v1'; document.getElementById('modelName').value = 'gpt-4o'; } }
-function saveAPISettings() { const s = { provider: document.getElementById('apiProvider').value, apiKey: document.getElementById('apiKey').value.trim(), apiBase: document.getElementById('apiBase').value.trim().replace(/\/+$/, ''), model: document.getElementById('modelName').value.trim() }; saveAPISettingsToStorage(s); closeModal('apiModal'); updateSettingsUI(); showToast('✅API设置已保存！'); }
+function getAPISettings() { const s = localStorage.getItem('kpop_sim_v6_settings'); if (s) return JSON.parse(s); return { provider:'deepseek', apiKey:'', apiBase:'https://api.deepseek.com', model:'deepseek-chat' }; }
+function saveAPISettingsToStorage(s) { localStorage.setItem('kpop_sim_v6_settings', JSON.stringify(s)); }
+function onProvChange() { const p = document.getElementById('apiProvider').value; if (p==='deepseek') { document.getElementById('apiBase').value = 'https://api.deepseek.com'; document.getElementById('modelName').value = 'deepseek-chat'; } else if (p==='openai') { document.getElementById('apiBase').value = 'https://api.openai.com/v1'; document.getElementById('modelName').value = 'gpt-4o'; } }
+function saveAPISettings() { const s = { provider:document.getElementById('apiProvider').value, apiKey:document.getElementById('apiKey').value.trim(), apiBase:document.getElementById('apiBase').value.trim().replace(/\/+$/,''), model:document.getElementById('modelName').value.trim() }; saveAPISettingsToStorage(s); closeModal('apiModal'); updateSettingsUI(); showToast('✅API设置已保存！'); }
 
 // ═══════════════════ 导入导出 ═══════════════════
-function exportData() { const data = { version: '5.0', exportedAt: new Date().toISOString(), state: { affection: S.affection, trust: S.trust, intimacy: S.intimacy, exposure: S.exposure, week: S.week, day: S.day, location: S.location, npcs: S.npcs, privacy: S.privacy, flags: S.flags, events: S.events, chatTab: S.chatTab, fontSize: S.fontSize, theme: S.theme }, conversationHistory: S.conversationHistory.map(m => ({ role: m.role, content: m.content, _wx: m._wx || false })), wxMessages: S.wxMessages, socialFeed: S.socialFeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'kpop-sim-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); URL.revokeObjectURL(url); showToast('📤数据已导出！'); }
-function importData(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if (data.version && data.state) { Object.assign(S, data.state); S.flags = data.state.flags || { dark: false, wangben: true, intimacy_scene: false }; S.conversationHistory = data.conversationHistory || []; S.wxMessages = data.wxMessages || []; S.socialFeed = data.socialFeed || []; if (S.conversationHistory.length === 0 || S.conversationHistory[0].role !== 'system') S.conversationHistory.unshift({ role: 'system', content: buildSP() }); if (data.state.fontSize) { S.fontSize = data.state.fontSize; document.documentElement.style.setProperty('--font-size', S.fontSize + 'px'); } if (data.state.theme) setTheme(data.state.theme); switchChatTab(S.chatTab || 'offline'); renderStats(); updateSettingsUI(); updateDiscBadge(); showToast('📥数据导入成功！'); } else { showToast('⚠️无效的备份文件'); } } catch (err) { showToast('⚠️文件解析失败：' + err.message); } }; reader.readAsText(file); event.target.value = ''; }
-function resetAll() { if (!confirm('确定要重置全部数据吗？此操作不可恢复！\n\n建议先导出备份。')) return; S.affection = 92; S.trust = 88; S.intimacy = 90; S.exposure = 25; S.location = '签售会后台休息室'; S.flags = { dark: false, wangben: true, intimacy_scene: false }; S.events = ['下周回归舞台彩排', 'Dispatch记者近期活跃于江南区']; S.wxMessages = []; S.conversationHistory = [{ role: 'system', content: buildSP() }, { role: 'assistant', content: OPENING_OFFLINE, _wx: false }]; initSocialFeed(); S.newSocialCount = 0; switchChatTab('offline'); renderStats(); updateSettingsUI(); updateDiscBadge(); document.getElementById('chatMessages').innerHTML = ''; addOffBubble('char', cleanAI(OPENING_OFFLINE)); showToast('🔄数据已重置'); }
+function exportData() {
+    const data = {
+        version:'6.0', exportedAt:new Date().toISOString(),
+        state:{ affection:S.affection, trust:S.trust, intimacy:S.intimacy, exposure:S.exposure, week:S.week, day:S.day, location:S.location, npcs:S.npcs, privacy:S.privacy, flags:S.flags, events:S.events, chatTab:S.chatTab, fontSize:S.fontSize, theme:S.theme, wallet:S.wallet, items:S.items, globalState:S.globalState, votingData:S.votingData, autoMsgEnabled:S.autoMsgEnabled, autoMsgInterval:S.autoMsgInterval },
+        conversationHistory:S.conversationHistory.map(m=>({role:m.role,content:m.content,_wx:m._wx||false,_npc:m._npc||null})),
+        wxMessages:S.wxMessages, socialFeed:S.socialFeed, docs:S.docs
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = 'kpop-sim-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+    URL.revokeObjectURL(url); showToast('📤数据已导出！');
+}
+
+function importData(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.version && data.state) {
+                Object.assign(S, data.state);
+                S.flags = data.state.flags || {dark:false,wangben:true,intimacy_scene:false};
+                S.items = data.state.items || [];
+                S.globalState = data.state.globalState || S.globalState;
+                S.votingData = data.state.votingData || S.votingData;
+                S.autoMsgEnabled = data.state.autoMsgEnabled || false;
+                S.autoMsgInterval = data.state.autoMsgInterval || 3;
+                S.conversationHistory = data.conversationHistory || [];
+                S.wxMessages = data.wxMessages || {};
+                S.socialFeed = data.socialFeed || [];
+                S.docs = data.docs || [];
+                if (S.conversationHistory.length===0||S.conversationHistory[0].role!=='system') S.conversationHistory.unshift({role:'system',content:buildSP()});
+                if (data.state.fontSize) { S.fontSize = data.state.fontSize; document.documentElement.style.setProperty('--font-size',S.fontSize+'px'); }
+                if (data.state.theme) setTheme(data.state.theme);
+                if (S.autoMsgEnabled) startAutoMsg();
+                switchChatTab(S.chatTab||'offline'); renderStats(); updateSettingsUI(); updateDiscBadge();
+                document.getElementById('walletBadge').textContent = S.wallet.toLocaleString();
+                showToast('📥数据导入成功！');
+            } else { showToast('⚠️无效的备份文件'); }
+        } catch(err) { showToast('⚠️文件解析失败：'+err.message); }
+    };
+    reader.readAsText(file); event.target.value = '';
+}
+
+function resetAll() {
+    if (!confirm('确定要重置全部数据吗？此操作不可恢复！\n\n建议先导出备份。')) return;
+    S.affection = 92; S.trust = 88; S.intimacy = 90; S.exposure = 25; S.location = '签售会后台休息室';
+    S.flags = {dark:false,wangben:true,intimacy_scene:false};
+    S.events = ['下周回归舞台彩排','Dispatch记者近期活跃于江南区'];
+    S.wxMessages = {}; Object.keys(WX_NPCS).forEach(k => S.wxMessages[k] = []);
+    S.wallet = 50000; S.items = [
+        {name:'红底高跟鞋',price:8800,icon:'👠',bought:false},{name:'香奈儿包',price:35000,icon:'👜',bought:true},{name:'冰美式',price:38,icon:'☕',bought:false},{name:'专辑',price:150,icon:'💿',bought:false},{name:'签售名额',price:2000,icon:'🎫',bought:false},{name:'Kiki零食',price:85,icon:'🐱',bought:false},
+    ];
+    S.votingData = {songName:'Moonlight',rank:3,myVotes:0,totalVotes:284000,progress:68};
+    S.globalState = {lastMeeting:'签售会后台（刚刚结束）',charLocation:'休息室',userLocation:'休息室（助理身份）',meetingStatus:'together',todayEvents:['签售会','晚間电台行程(21:00)'],nextMeeting:'今晚电台结束后'};
+    S.docs = [];
+    stopAutoMsg(); S.autoMsgEnabled = false;
+    S.conversationHistory = [{role:'system',content:buildSP()},{role:'assistant',content:OPENING_OFFLINE,_wx:false}];
+    initSocialFeed(); S.newSocialCount = 0;
+    switchChatTab('offline'); renderStats(); updateSettingsUI(); updateDiscBadge();
+    document.getElementById('chatMessages').innerHTML = ''; addOffBubble('char',cleanAI(OPENING_OFFLINE),1);
+    document.getElementById('walletBadge').textContent = S.wallet.toLocaleString();
+    showToast('🔄数据已重置');
+}
 
 // ═══════════════════ Toast ═══════════════════
 function showToast(msg) { const existing = document.querySelector('.toast'); if (existing) existing.remove(); const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = msg; document.body.appendChild(toast); setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 300); }, 2000); }
 
 // ═══════════════════ 初始化 ═══════════════════
 function init() {
-    S.conversationHistory = [{ role: 'system', content: buildSP() }, { role: 'assistant', content: OPENING_OFFLINE, _wx: false }];
+    S.conversationHistory = [{role:'system',content:buildSP()},{role:'assistant',content:OPENING_OFFLINE,_wx:false}];
+    Object.keys(WX_NPCS).forEach(k => { if (!S.wxMessages[k]) S.wxMessages[k] = []; });
     initSocialFeed();
-    addOffBubble('char', cleanAI(OPENING_OFFLINE));
-    renderStats();
-    updateSettingsUI();
+    addOffBubble('char',cleanAI(OPENING_OFFLINE),1);
+    renderStats(); renderGlobalState(); updateSettingsUI();
+    document.getElementById('walletBadge').textContent = S.wallet.toLocaleString();
     const textarea = document.getElementById('userInput');
-    textarea.addEventListener('input', () => { textarea.style.height = 'auto'; textarea.style.height = Math.min(textarea.scrollHeight, 80) + 'px'; });
-    const savedTheme = localStorage.getItem('kpop_sim_theme');
-    if (savedTheme) setTheme(savedTheme);
-    const savedFont = localStorage.getItem('kpop_sim_fontSize');
-    if (savedFont) { S.fontSize = parseInt(savedFont); document.documentElement.style.setProperty('--font-size', S.fontSize + 'px'); }
-    const settings = getAPISettings();
-    if (!settings.apiKey) setTimeout(() => openModal('apiModal'), 800);
-    setInterval(() => { const n = new Date(); document.getElementById('phoneTime').textContent = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'); }, 30000);
-    console.log('📱韩娱嫂子模拟器 v5.0 | Char:郁白 | User:云雾敛 | 社交互动+主题字体');
+    textarea.addEventListener('input',()=>{textarea.style.height='auto';textarea.style.height=Math.min(textarea.scrollHeight,80)+'px';});
+    const savedTheme = localStorage.getItem('kpop_sim_theme'); if (savedTheme) setTheme(savedTheme);
+    const savedFont = localStorage.getItem('kpop_sim_fontSize'); if (savedFont) { S.fontSize = parseInt(savedFont); document.documentElement.style.setProperty('--font-size',S.fontSize+'px'); }
+    const savedWallet = localStorage.getItem('kpop_sim_wallet'); if (savedWallet) { S.wallet = parseInt(savedWallet); document.getElementById('walletBadge').textContent = S.wallet.toLocaleString(); }
+    const settings = getAPISettings(); if (!settings.apiKey) setTimeout(()=>openModal('apiModal'),800);
+    setInterval(()=>{const n=new Date();document.getElementById('phoneTime').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');},30000);
+    console.log('📱韩娱嫂子模拟器 v6.0 | Char:郁白 | User:云雾敛 | 多NPC+钱包+打歌+文档+主动消息');
 }
 init();
 </script>
 </body>
 </html>
+}

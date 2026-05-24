@@ -1,347 +1,195 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>📱 韩娱嫂子模拟器 v4.0</title>
-    <style>
-        :root {
-            --phone-bg: #0a0a0f;
-            --surface: #12121a;
-            --surface2: #1a1a28;
-            --text: #d4d4dc;
-            --text2: #a0a0b8;
-            --accent: #c9a0dc;
-            --accent2: #e8b4b8;
-            --gold: #d4a574;
-            --border: #252540;
-            --wechat-bg: #ededed;
-            --wechat-green: #07c160;
-            --font: 'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif;
-        }
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{
-            background:#1a1a2e;display:flex;align-items:center;justify-content:center;
-            min-height:100vh;font-family:var(--font);
-        }
-        /* 手机壳 */
-        .phone-frame{
-            width:420px;max-width:100vw;height:92vh;max-height:900px;
-            background:var(--phone-bg);border-radius:28px;border:3px solid #333;
-            box-shadow:0 0 0 2px #1a1a1a,0 20px 60px rgba(0,0,0,0.6);
-            display:flex;flex-direction:column;overflow:hidden;position:relative;
-        }
-        @media(max-width:440px){
-            .phone-frame{width:100vw;height:100vh;max-height:100vh;border-radius:0;border:none;box-shadow:none;}
-        }
-        /* 状态栏 */
-        .phone-statusbar{
-            background:var(--surface);padding:8px 20px;display:flex;
-            justify-content:space-between;align-items:center;font-size:11px;color:#fff;
-            flex-shrink:0;border-bottom:1px solid var(--border);
-        }
-        .phone-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
-        /* 底部导航 */
-        .bottom-nav{
-            background:var(--surface);border-top:1px solid var(--border);
-            display:flex;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));flex-shrink:0;
-        }
-        .bottom-nav button{
-            flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-            cursor:pointer;color:var(--text2);font-size:10px;padding:4px 0;
-            transition:all 0.2s;border:none;background:none;
-        }
-        .bottom-nav button.active{color:var(--accent);}
-        .bottom-nav .nav-icon{font-size:20px;}
-        /* 页面 */
-        .page{flex:1;overflow-y:auto;display:none;flex-direction:column;-webkit-overflow-scrolling:touch;}
-        .page.active{display:flex;}
-        /* 子标签 */
-        .sub-tabs{display:flex;gap:2px;padding:6px 10px;background:var(--surface);flex-shrink:0;}
-        .sub-tabs button{
-            flex:1;padding:6px 0;text-align:center;font-size:11px;cursor:pointer;
-            border-radius:6px;border:none;background:transparent;color:var(--text2);font-weight:600;transition:all 0.2s;
-        }
-        .sub-tabs button.active{background:var(--accent);color:#000;}
-        /* 消息区 */
-        .messages{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:6px;}
-        .messages.wx{background:var(--wechat-bg);}
-        .msg{
-            max-width:85%;padding:10px 13px;border-radius:14px;line-height:1.6;font-size:13px;
-            animation:fadeIn 0.25s ease;
-        }
-        @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
-        .msg.usr{align-self:flex-end;background:#1e1e35;border:1px solid var(--border);border-bottom-right-radius:4px;}
-        .msg.char{
-            align-self:flex-start;background:#1a1228;border:1px solid #2a2040;border-bottom-left-radius:4px;
-        }
-        .msg .sender{font-size:10px;font-weight:700;margin-bottom:3px;}
-        .msg.usr .sender{color:var(--accent2);}
-        .msg.char .sender{color:var(--accent);}
-        .msg .body{white-space:pre-wrap;word-break:break-word;}
-        /* 微信消息 */
-        .wx-msg{max-width:75%;margin:2px 0;animation:fadeIn 0.2s ease;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;}
-        .wx-msg.me{align-self:flex-end;text-align:right;}
-        .wx-msg.you{align-self:flex-start;text-align:left;}
-        .wx-msg .wx-time{text-align:center;font-size:10px;color:#b0b0b0;margin:8px 0 2px;align-self:center;background:#d9d9d9;display:inline-block;padding:2px 8px;border-radius:3px;}
-        .wx-msg .wx-header{font-size:10px;color:#999;margin-bottom:2px;padding:0 4px;}
-        .wx-msg .wx-bubble{display:inline-block;padding:9px 12px;border-radius:4px;font-size:15px;line-height:1.5;word-break:break-word;}
-        .wx-msg.me .wx-bubble{background:#95ec69;color:#111;}
-        .wx-msg.you .wx-bubble{background:#fff;color:#111;}
-        .wx-msg .wx-trans{font-size:11px;color:#888;margin-top:2px;padding:0 4px;}
-        .wx-msg .wx-ip{font-size:9px;color:#bbb;margin-top:2px;padding:0 4px;}
-        .wx-msg .wx-voice{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#fff;border-radius:4px;cursor:pointer;}
-        .wx-msg .wx-transfer-card{display:inline-block;border-radius:8px;padding:12px 16px;color:#fff;font-weight:700;min-width:140px;text-align:center;}
-        .wx-msg .wx-system{text-align:center;font-size:10px;color:#b0b0b0;margin:4px 0;}
-        /* 输入区 */
-        .input-area{padding:8px 10px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:6px;flex-shrink:0;}
-        .input-area.wx{background:#f7f7f7;border-top:1px solid #d9d9d9;}
-        .input-area textarea{
-            flex:1;background:var(--phone-bg);border:1px solid var(--border);border-radius:18px;
-            padding:8px 14px;color:var(--text);font-family:var(--font);font-size:14px;
-            resize:none;min-height:36px;max-height:80px;outline:none;
-        }
-        .input-area.wx textarea{background:#fff;border:1px solid #d9d9d9;color:#111;border-radius:4px;}
-        .btn-send{
-            border:none;color:#fff;font-weight:700;padding:6px 14px;border-radius:18px;
-            cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;background:var(--accent);
-        }
-        .btn-send.wx{background:var(--wechat-green);border-radius:4px;}
-        .btn-send:disabled{opacity:0.4;cursor:not-allowed;}
-        .wx-actions{display:none;gap:4px;padding:4px 10px;background:#f7f7f7;flex-shrink:0;}
-        .wx-actions.show{display:flex;}
-        .wx-actions button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px;border-radius:4px;}
-        /* 发现页 */
-        .discover-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
-        .discover-card{
-            background:var(--surface);border:1px solid var(--border);border-radius:12px;
-            padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;
-        }
-        .discover-card:active{border-color:var(--accent);}
-        .discover-card .ci{font-size:32px;margin-bottom:6px;}
-        .discover-card .cl{font-size:12px;font-weight:700;color:#fff;}
-        .discover-card .cs{font-size:10px;color:var(--text2);}
-        /* 社交Feed */
-        .social-post{
-            background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-            padding:10px 12px;margin:4px 10px;font-size:11px;
-        }
-        .social-post .ph{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-        .social-post .pa{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-        .social-post .pu{font-weight:700;font-size:12px;color:#fff;}
-        .social-post .phn{font-size:10px;color:var(--text2);}
-        .social-post .pp{font-size:9px;color:var(--accent);margin-left:auto;padding:2px 6px;background:rgba(201,160,220,0.15);border-radius:4px;}
-        .social-post .pb{color:var(--text);line-height:1.5;margin-bottom:4px;}
-        .social-post .pst{display:flex;gap:14px;font-size:10px;color:var(--text2);margin-top:4px;}
-        .social-post .pti{font-size:9px;color:#555;margin-top:2px;}
-        .social-post.new{border-left:2px solid var(--accent);}
-        /* 豆瓣 */
-        .douban-post{
-            background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-            padding:12px;margin:4px 10px;font-size:11px;
-        }
-        .douban-post .dg{font-size:9px;color:#6ba346;margin-bottom:4px;}
-        .douban-post .dt{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;}
-        .douban-post .db{color:var(--text);line-height:1.6;margin-bottom:6px;}
-        .douban-post .dc{background:var(--surface);border-radius:6px;padding:8px;margin-top:6px;}
-        .douban-comment{padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:10px;}
-        .douban-comment .cu{color:#6ba346;font-weight:600;}
-        /* 状态卡 */
-        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin:4px 10px;}
-        .stat-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;}
-        .sl{color:var(--text2);}.sv{font-weight:700;}
-        .mini-bar{width:100%;height:3px;background:var(--border);border-radius:2px;margin:2px 0 8px;}
-        .mini-bar-fill{height:100%;border-radius:2px;transition:width 0.5s;}
-        .tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:9px;font-weight:600;}
-        .tag-on{background:#e74c3c22;color:#e74c3c;}.tag-off{background:#88888822;color:#666;}
-        /* 设置 */
-        .settings-section{padding:14px;}
-        .settings-section h4{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px;}
-        .settings-btn{
-            width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
-            padding:12px;border-radius:8px;text-align:left;cursor:pointer;font-size:13px;
-            margin:3px 0;display:flex;align-items:center;gap:8px;
-        }
-        .settings-btn:active{border-color:var(--accent);}
-        .settings-btn.danger{color:#e74c3c;border-color:#e74c3c33;}
-        /* 打字 */
-        .typing-dots{display:flex;gap:4px;padding:8px 12px;align-self:flex-start;}
-        .typing-dots span{width:6px;height:6px;border-radius:50%;background:#999;animation:bounce 1.2s infinite;}
-        .typing-dots span:nth-child(2){animation-delay:0.2s;}
-        .typing-dots span:nth-child(3){animation-delay:0.4s;}
-        @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
-        /* 弹窗 - 关键：放在 phone-frame 外面！ */
-        .modal-overlay{
-            position:fixed;top:0;left:0;width:100%;height:100%;
-            background:rgba(0,0,0,0.75);z-index:9999;display:none;
-            align-items:center;justify-content:center;
-        }
-        .modal-overlay.show{display:flex;}
-        .modal{
-            background:var(--surface);border:1px solid var(--border);border-radius:16px;
-            padding:22px;width:380px;max-width:92vw;max-height:80vh;overflow-y:auto;
-        }
-        .modal h3{color:#fff;margin-bottom:10px;font-size:17px;}
-        .modal label{display:block;color:var(--text2);font-size:11px;margin-bottom:3px;margin-top:10px;}
-        .modal input,.modal select,.modal textarea{
-            width:100%;background:var(--phone-bg);border:1px solid var(--border);
-            border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;margin:4px 0;
-        }
-        .modal input:focus,.modal select:focus{border-color:var(--accent);}
-        .modal .btn-row{display:flex;gap:8px;margin-top:14px;}
-        .btn-pri{flex:1;background:var(--accent);border:none;color:#000;font-weight:700;padding:10px;border-radius:8px;cursor:pointer;}
-        .btn-sec{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;cursor:pointer;}
-        /* toast */
-        .toast{
-            position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-            background:#333;color:#fff;padding:8px 18px;border-radius:18px;
-            font-size:12px;z-index:9999;pointer-events:none;animation:fadeIn 0.3s ease;
-        }
-        /* 徽章 */
-        .badge-dot{
-            width:8px;height:8px;border-radius:50%;background:#e74c3c;
-            position:absolute;margin-left:14px;margin-top:-4px;
-        }
-        /* 滚动条 */
-        .page::-webkit-scrollbar,.messages::-webkit-scrollbar{width:3px;}
-        .page::-webkit-scrollbar-thumb,.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>📱 韩娱嫂子模拟器</title>
+<style>
+:root{
+--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a28;--text:#d4d4dc;--text2:#a0a0b8;
+--accent:#c9a0dc;--accent2:#e8b4b8;--gold:#d4a574;--border:#252540;
+--wechat-bg:#ededed;--wechat-green:#07c160;
+--font:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:var(--font)}
+.phone-frame{width:420px;max-width:100vw;height:92vh;max-height:900px;background:var(--bg);border-radius:28px;border:3px solid #333;box-shadow:0 0 0 2px #1a1a1a,0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;position:relative}
+@media(max-width:440px){.phone-frame{width:100vw;height:100vh;max-height:100vh;border-radius:0;border:none;box-shadow:none}}
+.phone-statusbar{background:var(--surface);padding:8px 20px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff;flex-shrink:0;border-bottom:1px solid var(--border)}
+.phone-content{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.bottom-nav{background:var(--surface);border-top:1px solid var(--border);display:flex;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));flex-shrink:0}
+.bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--text2);font-size:10px;padding:4px 0;transition:all .2s;border:none;background:none}
+.bottom-nav button.active{color:var(--accent)}
+.nav-icon{font-size:20px}
+.page{flex:1;overflow-y:auto;display:none;flex-direction:column;-webkit-overflow-scrolling:touch}
+.page.active{display:flex}
+.sub-tabs{display:flex;gap:2px;padding:6px 10px;background:var(--surface);flex-shrink:0}
+.sub-tabs button{flex:1;padding:6px 0;text-align:center;font-size:11px;cursor:pointer;border-radius:6px;border:none;background:0 0;color:var(--text2);font-weight:600;transition:all .2s}
+.sub-tabs button.active{background:var(--accent);color:#000}
+.messages{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.messages.wx{background:var(--wechat-bg)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.msg{max-width:85%;padding:10px 13px;border-radius:14px;line-height:1.6;font-size:13px;animation:fadeIn .25s ease}
+.msg.usr{align-self:flex-end;background:#1e1e35;border:1px solid var(--border);border-bottom-right-radius:4px}
+.msg.char{align-self:flex-start;background:#1a1228;border:1px solid #2a2040;border-bottom-left-radius:4px}
+.msg .sender{font-size:10px;font-weight:700;margin-bottom:3px}
+.msg.usr .sender{color:var(--accent2)}.msg.char .sender{color:var(--accent)}
+.msg .body{white-space:pre-wrap;word-break:break-word}
+.wx-msg{max-width:75%;margin:2px 0;animation:fadeIn .2s ease;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+.wx-msg.me{align-self:flex-end;text-align:right}
+.wx-msg.you{align-self:flex-start;text-align:left}
+.wx-msg .wx-time{text-align:center;font-size:10px;color:#b0b0b0;margin:8px 0 2px;align-self:center;background:#d9d9d9;display:inline-block;padding:2px 8px;border-radius:3px}
+.wx-msg .wx-bubble{display:inline-block;padding:9px 12px;border-radius:4px;font-size:15px;line-height:1.5;word-break:break-word}
+.wx-msg.me .wx-bubble{background:#95ec69;color:#111}
+.wx-msg.you .wx-bubble{background:#fff;color:#111}
+.wx-msg .wx-header{font-size:10px;color:#999;margin-bottom:2px;padding:0 4px}
+.wx-msg .wx-trans{font-size:11px;color:#888;margin-top:2px;padding:0 4px}
+.wx-msg .wx-ip{font-size:9px;color:#bbb;margin-top:2px;padding:0 4px}
+.input-area{padding:8px 10px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:6px;flex-shrink:0}
+.input-area.wx{background:#f7f7f7;border-top:1px solid #d9d9d9}
+.input-area textarea{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:8px 14px;color:var(--text);font-family:var(--font);font-size:14px;resize:none;min-height:36px;max-height:80px;outline:none}
+.input-area.wx textarea{background:#fff;border:1px solid #d9d9d9;color:#111;border-radius:4px}
+.btn-send{border:none;color:#fff;font-weight:700;padding:6px 14px;border-radius:18px;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;background:var(--accent)}
+.btn-send.wx{background:var(--wechat-green);border-radius:4px}
+.btn-send:disabled{opacity:.4;cursor:not-allowed}
+.wx-actions{display:none;gap:4px;padding:4px 10px;background:#f7f7f7;flex-shrink:0}
+.wx-actions.show{display:flex}
+.wx-actions button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px;border-radius:4px}
+.discover-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.discover-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .2s}
+.discover-card:active{border-color:var(--accent)}
+.ci{font-size:32px;margin-bottom:6px}.cl{font-size:12px;font-weight:700;color:#fff}.cs{font-size:10px;color:var(--text2)}
+.social-post{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:4px 10px;font-size:11px}
+.social-post .ph{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.social-post .pa{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.social-post .pu{font-weight:700;font-size:12px;color:#fff}
+.social-post .phn{font-size:10px;color:var(--text2)}
+.social-post .pp{font-size:9px;color:var(--accent);margin-left:auto;padding:2px 6px;background:rgba(201,160,220,.15);border-radius:4px}
+.social-post .pb{color:var(--text);line-height:1.5;margin-bottom:4px}
+.social-post .pst{display:flex;gap:14px;font-size:10px;color:var(--text2);margin-top:4px}
+.social-post .pti{font-size:9px;color:#555;margin-top:2px}
+.social-post.new{border-left:2px solid var(--accent)}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin:4px 10px}
+.stat-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px}
+.sl{color:var(--text2)}.sv{font-weight:700}
+.mini-bar{width:100%;height:3px;background:var(--border);border-radius:2px;margin:2px 0 8px}
+.mini-bar-fill{height:100%;border-radius:2px;transition:width .5s}
+.tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:9px;font-weight:600}
+.tag-on{background:#e74c3c22;color:#e74c3c}.tag-off{background:#88888822;color:#666}
+.settings-section{padding:14px}
+.settings-section h4{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px}
+.settings-btn{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:8px;text-align:left;cursor:pointer;font-size:13px;margin:3px 0;display:flex;align-items:center;gap:8px}
+.settings-btn:active{border-color:var(--accent)}
+.settings-btn.danger{color:#e74c3c;border-color:#e74c3c33}
+.typing-dots{display:flex;gap:4px;padding:8px 12px;align-self:flex-start}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:#999;animation:bounce 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:9999;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;width:380px;max-width:92vw;max-height:80vh;overflow-y:auto}
+.modal h3{color:#fff;margin-bottom:10px;font-size:17px}
+.modal label{display:block;color:var(--text2);font-size:11px;margin-bottom:3px;margin-top:10px}
+.modal input,.modal select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;margin:4px 0}
+.modal input:focus,.modal select:focus{border-color:var(--accent)}
+.modal .btn-row{display:flex;gap:8px;margin-top:14px}
+.btn-pri{flex:1;background:var(--accent);border:none;color:#000;font-weight:700;padding:10px;border-radius:8px;cursor:pointer}
+.btn-sec{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;cursor:pointer}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 18px;border-radius:18px;font-size:12px;z-index:9999;pointer-events:none;animation:fadeIn .3s ease}
+.badge-dot{width:8px;height:8px;border-radius:50%;background:#e74c3c;position:absolute;margin-left:14px;margin-top:-4px}
+.page::-webkit-scrollbar,.messages::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb,.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
 </head>
 <body>
 
-<!-- ═══ 所有弹窗放在手机壳外面！═══ -->
-<!-- API设置弹窗 -->
+<!-- 弹窗(手机壳外面) -->
 <div class="modal-overlay" id="apiModal">
-    <div class="modal">
-        <h3>⚙️ API 设置</h3>
-        <label>提供商</label>
-        <select id="apiProvider" onchange="onProvChange()">
-            <option value="deepseek">DeepSeek（推荐）</option>
-            <option value="openai">OpenAI</option>
-            <option value="custom">自定义</option>
-        </select>
-        <label>API Key</label>
-        <input type="password" id="apiKey" placeholder="sk-...">
-        <label>Base URL</label>
-        <input type="text" id="apiBase" placeholder="https://api.deepseek.com/v1">
-        <label>模型</label>
-        <input type="text" id="modelName" placeholder="deepseek-chat">
-        <div class="btn-row">
-            <button class="btn-sec" onclick="closeModal('apiModal')">取消</button>
-            <button class="btn-pri" onclick="saveAPISettings()">💾 保存</button>
-        </div>
-        <div style="font-size:9px;color:var(--text2);margin-top:8px;text-align:center;">💡 platform.deepseek.com → API Keys（新用户送500万tokens）</div>
-    </div>
-</div>
+<div class="modal">
+<h3>⚙️ API 设置</h3>
+<label>提供商</label>
+<select id="apiProvider" onchange="onProvChange()"><option value="deepseek">DeepSeek(推荐)</option><option value="openai">OpenAI</option><option value="custom">自定义</option></select>
+<label>API Key</label><input type="password" id="apiKey" placeholder="sk-...">
+<label>Base URL</label><input type="text" id="apiBase" placeholder="https://api.deepseek.com/v1">
+<label>模型</label><input type="text" id="modelName" placeholder="deepseek-chat">
+<div class="btn-row"><button class="btn-sec" onclick="closeModal('apiModal')">取消</button><button class="btn-pri" onclick="saveAPISettings()">💾保存</button></div>
+<div style="font-size:9px;color:var(--text2);margin-top:8px;text-align:center">💡 platform.deepseek.com → API Keys</div>
+</div></div>
 
-<!-- 社交Feed弹窗 -->
 <div class="modal-overlay" id="socialModal">
-    <div class="modal" style="width:95vw;max-width:500px;max-height:85vh;" id="socialModalContent"></div>
+<div class="modal" style="width:95vw;max-width:500px;max-height:85vh" id="socialModalContent"></div>
 </div>
 
-<!-- ═══ 手机框架 ═══ -->
-<div class="phone-frame" id="phoneFrame">
-    <!-- 状态栏 -->
-    <div class="phone-statusbar">
-        <span id="phoneTime">21:03</span>
-        <span>📶 🔋 85%</span>
-    </div>
+<!-- 手机壳 -->
+<div class="phone-frame">
+<div class="phone-statusbar"><span id="phoneTime">21:03</span><span>📶 🔋85%</span></div>
+<div class="phone-content">
 
-    <!-- 内容区 -->
-    <div class="phone-content">
-
-        <!-- ═══ 聊天页 ═══ -->
-        <div class="page active" id="page-chat">
-            <div class="sub-tabs">
-                <button class="active" onclick="switchChatTab('offline')">🏠 线下场景</button>
-                <button onclick="switchChatTab('wechat')">💬 微信</button>
-            </div>
-            <div class="messages" id="chatMessages"></div>
-            <div class="wx-actions" id="wxActions">
-                <button onclick="wxQuick('voice')" title="语音">🎤</button>
-                <button onclick="wxQuick('image')" title="照片">📷</button>
-                <button onclick="wxQuick('video')" title="视频通话">📹</button>
-                <button onclick="wxQuick('call')" title="打电话">📞</button>
-                <button onclick="wxQuick('transfer')" title="转账">💳</button>
-                <button onclick="wxQuick('moments')" title="朋友圈">🟢</button>
-            </div>
-            <div class="input-area" id="chatInputArea">
-                <textarea id="userInput" rows="1" placeholder="输入云雾敛的台词/动作..."
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
-            <button class="btn-send" id="btnSend" onclick="sendMessage()">发送</button>
-        </div>
-    </div>
-
-    <!-- ═══ 发现页 ═══ -->
-    <div class="page" id="page-discover">
-        <div class="discover-grid">
-            <div class="discover-card" onclick="openSocial('weibo')"><div class="ci">🧣</div><div class="cl">微博</div><div class="cs">粉丝实时讨论</div></div>
-            <div class="discover-card" onclick="openSocial('twitter')"><div class="ci">🐦</div><div class="cl">Twitter/X</div><div class="cs">国际饭圈动态</div></div>
-            <div class="discover-card" onclick="openSocial('instagram')"><div class="ci">📸</div><div class="cl">Instagram</div><div class="cs">Dispatch & 饭拍</div></div>
-            <div class="discover-card" onclick="openSocial('douban')"><div class="ci">📚</div><div class="cl">豆瓣</div><div class="cs">韩娱小组吃瓜</div></div>
-            <div class="discover-card" onclick="openSocial('moments')"><div class="ci">🟢</div><div class="cl">朋友圈</div><div class="cs">好友动态</div></div>
-        </div>
-        <div id="socialFeedContainer" style="flex:1;overflow-y:auto;"></div>
-    </div>
-
-    <!-- ═══ 状态页 ═══ -->
-    <div class="page" id="page-stats" style="overflow-y:auto;">
-        <div style="padding:10px;">
-            <div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0;">📊 关系状态</div>
-            <div class="stat-card" id="statsCard"></div>
-            <div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px;">🏷️ 触发标记</div>
-            <div class="stat-card" id="flagsCard"></div>
-            <div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px;">📌 事件</div>
-            <div class="stat-card" id="eventsCard"></div>
-        </div>
-    </div>
-
-    <!-- ═══ 设置页 ═══ -->
-    <div class="page" id="page-settings" style="overflow-y:auto;">
-        <div class="settings-section">
-            <h4>🔌 API 配置</h4>
-            <button class="settings-btn" onclick="openModal('apiModal')">⚙️ 设置 API Key 和模型</button>
-            <div style="font-size:10px;color:var(--text2);margin:4px 0;" id="apiStatus">未配置</div>
-            <h4>💾 数据管理</h4>
-            <button class="settings-btn" onclick="exportData()">📤 导出数据备份</button>
-            <button class="settings-btn" onclick="document.getElementById('importFile').click()">📥 导入数据备份</button>
-            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
-            <button class="settings-btn danger" onclick="resetAll()">🔄 重置全部数据</button>
-            <h4>📖 文档</h4>
-            <button class="settings-btn" onclick="window.open('manual.html','_blank')">📖 查看规则手册</button>
-            <button class="settings-btn" onclick="window.open('api.html','_blank')">📡 查看 API 文档</button>
-            <div style="font-size:9px;color:#555;text-align:center;margin-top:20px;">📱 韩娱嫂子模拟器 v4.0<br>Char: 郁白 · User: 云雾敛</div>
-        </div>
-    </div>
+<!-- 聊天页 -->
+<div class="page active" id="page-chat">
+<div class="sub-tabs"><button class="active" onclick="switchChatTab('offline')">🏠线下场景</button><button onclick="switchChatTab('wechat')">💬微信</button></div>
+<div class="messages" id="chatMessages"></div>
+<div class="wx-actions" id="wxActions">
+<button onclick="wxQuick('voice')">🎤</button><button onclick="wxQuick('image')">📷</button><button onclick="wxQuick('video')">📹</button><button onclick="wxQuick('call')">📞</button><button onclick="wxQuick('transfer')">💳</button><button onclick="wxQuick('moments')">🟢</button>
+</div>
+<div class="input-area" id="chatInputArea">
+<textarea id="userInput" rows="1" placeholder="输入云雾敛的台词/动作..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+<button class="btn-send" id="btnSend" onclick="sendMessage()">发送</button>
+</div>
 </div>
 
-<!-- 底部导航 -->
+<!-- 发现页 -->
+<div class="page" id="page-discover">
+<div class="discover-grid">
+<div class="discover-card" onclick="openSocial('weibo')"><div class="ci">🧣</div><div class="cl">微博</div><div class="cs">粉丝实时讨论</div></div>
+<div class="discover-card" onclick="openSocial('twitter')"><div class="ci">🐦</div><div class="cl">Twitter/X</div><div class="cs">国际饭圈动态</div></div>
+<div class="discover-card" onclick="openSocial('instagram')"><div class="ci">📸</div><div class="cl">Instagram</div><div class="cs">Dispatch&饭拍</div></div>
+<div class="discover-card" onclick="openSocial('douban')"><div class="ci">📚</div><div class="cl">豆瓣</div><div class="cs">韩娱小组吃瓜</div></div>
+<div class="discover-card" onclick="openSocial('moments')"><div class="ci">🟢</div><div class="cl">朋友圈</div><div class="cs">好友动态</div></div>
+</div>
+<div id="socialFeedContainer" style="flex:1;overflow-y:auto"></div>
+</div>
+
+<!-- 状态页 -->
+<div class="page" id="page-stats" style="overflow-y:auto"><div style="padding:10px">
+<div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">📊关系状态</div><div class="stat-card" id="statsCard"></div>
+<div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px">🏷️触发标记</div><div class="stat-card" id="flagsCard"></div>
+<div style="font-size:12px;color:var(--accent);font-weight:700;margin:12px 0 4px">📌事件</div><div class="stat-card" id="eventsCard"></div>
+</div></div>
+
+<!-- 设置页 -->
+<div class="page" id="page-settings" style="overflow-y:auto"><div class="settings-section">
+<h4>🔌API配置</h4><button class="settings-btn" onclick="openModal('apiModal')">⚙️设置API Key和模型</button><div style="font-size:10px;color:var(--text2);margin:4px 0" id="apiStatus">未配置</div>
+<h4>💾数据管理</h4><button class="settings-btn" onclick="exportData()">📤导出数据备份</button><button class="settings-btn" onclick="document.getElementById('importFile').click()">📥导入数据备份</button><input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"><button class="settings-btn danger" onclick="resetAll()">🔄重置全部数据</button>
+<h4>📖文档</h4><button class="settings-btn" onclick="window.open('manual.html','_blank')">📖查看规则手册</button><button class="settings-btn" onclick="window.open('api.html','_blank')">📡查看API文档</button>
+<div style="font-size:9px;color:#555;text-align:center;margin-top:20px">📱韩娱嫂子模拟器 v4.0<br>Char:郁白·User:云雾敛</div>
+</div></div>
+
+</div>
 <div class="bottom-nav">
-    <button class="active" onclick="switchPage('chat')"><span class="nav-icon">💬</span>聊天</button>
-    <button onclick="switchPage('discover')"><span class="nav-icon">🌐</span>发现<span class="badge-dot" id="discBadge" style="display:none;"></span></button>
-    <button onclick="switchPage('stats')"><span class="nav-icon">📊</span>状态</button>
-    <button onclick="switchPage('settings')"><span class="nav-icon">⚙️</span>设置</button>
+<button class="active" onclick="switchPage('chat')"><span class="nav-icon">💬</span>聊天</button>
+<button onclick="switchPage('discover')"><span class="nav-icon">🌐</span>发现<span class="badge-dot" id="discBadge" style="display:none"></span></button>
+<button onclick="switchPage('stats')"><span class="nav-icon">📊</span>状态</button>
+<button onclick="switchPage('settings')"><span class="nav-icon">⚙️</span>设置</button>
 </div>
-</div>
-
-<script>
-// ═══════════════════════ 全局状态 ═══════════════════════
+</div><script>
+// ═══════════════════ 全局状态 ═══════════════════
 const S = {
-    affection:92, trust:88, intimacy:90, exposure:25,
-    week:104, day:'周六', location:'签售会后台休息室',
-    npcs:['队友A(沙发玩手机)','造型师(走廊打电话)','经纪人(随时进来)'],
-    privacy:'semi_public',
-    flags:{dark:false,wangben:true,intimacy_scene:false},
-    events:['下周回归舞台彩排','Dispatch记者近期活跃于江南区'],
-    chatTab:'offline', currentPage:'chat',
-    conversationHistory:[],
-    socialFeed:[],
-    wxMessages:[],
-    newSocialCount:0
+    affection: 92, trust: 88, intimacy: 90, exposure: 25,
+    week: 104, day: '周六', location: '签售会后台休息室',
+    npcs: ['队友A(沙发玩手机)', '造型师(走廊打电话)', '经纪人(随时进来)'],
+    privacy: 'semi_public',
+    flags: { dark: false, wangben: true, intimacy_scene: false },
+    events: ['下周回归舞台彩排', 'Dispatch记者近期活跃于江南区'],
+    chatTab: 'offline', currentPage: 'chat',
+    conversationHistory: [],
+    socialFeed: [],
+    wxMessages: [],
+    newSocialCount: 0
 };
 
-// ═══════════════════════ System Prompt ═══════════════════════
-function buildSP(){
+// ═══════════════════ System Prompt ═══════════════════
+function buildSP() {
     return `你是郁白(Yu Bai)，韩国6人男团顶流偶像。中韩混血，192cm，23岁，天蝎座，财阀背景。
 
 【用户】云雾敛（緣緣），22岁，168cm。原为你的站姐Four.Y，现为未婚妻（已订婚），公开掩护身份为你的"私人生活助理"。在一起两年。
@@ -351,7 +199,6 @@ function buildSP(){
 【语言规则·全球翻译】
 - 公开场合（线下模式）：你说韩语，每句韩语后附【中文翻译】
 - 微信聊天：私下说中文为主。偶尔发韩语消息时自动附翻译
-- 中韩混血身份：你在韩国出生长大但中文流利，两种语言自然切换
 
 【台词技法·线下公开/半公开必须使用】
 ①信息差：包装成对全员的普通指令，关键词只有她懂
@@ -360,7 +207,7 @@ function buildSP(){
 
 【爱称】公开："云雾敛"/"助理"；半公开：偶尔"緣緣"；私密："老婆"（最高频）、"宝宝"、"緣緣"（拖腔）
 
-【微信聊天风格】文字简短自然，像真人聊天。每条1-3行。偶尔带占有欲但不油腻（"到家发消息""谁送你回去的"）。可以用emoji但不过度。可能发语音、转账、照片描述。
+【微信风格】文字简短自然，每条1-3行。偶尔带占有欲但不油腻。可以用emoji不过度。
 
 【禁止】"我的""值了""我守着你""今晚别想睡了""草莓牛奶""我等你""赤足""低吼""野兽""碎了""再说一遍""我想听""再叫"
 
@@ -392,374 +239,418 @@ const OPENING_OFFLINE = `他刚从签售会下来，耳返还挂在脖子上。�
 │ 🌐新社交动态:无               │
 └────────────────────────────────┘`;
 
-// ═══════════════════════ 弹窗 ═══════════════════════
-function openModal(id){document.getElementById(id).classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-document.getElementById('apiModal').addEventListener('click',function(e){if(e.target===this)closeModal('apiModal');});
-document.getElementById('socialModal').addEventListener('click',function(e){if(e.target===this)closeModal('socialModal');});
+// ═══════════════════ 弹窗 ═══════════════════
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.getElementById('apiModal').addEventListener('click', function(e) { if (e.target === this) closeModal('apiModal'); });
+document.getElementById('socialModal').addEventListener('click', function(e) { if (e.target === this) closeModal('socialModal'); });
 
-// ═══════════════════════ 页面切换 ═══════════════════════
-function switchPage(p){
-    S.currentPage=p;
-    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-    document.getElementById('page-'+p).classList.add('active');
-    document.querySelectorAll('.bottom-nav button').forEach((b,i)=>{
+// ═══════════════════ 页面切换 ═══════════════════
+function switchPage(p) {
+    S.currentPage = p;
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-' + p).classList.add('active');
+    document.querySelectorAll('.bottom-nav button').forEach((b, i) => {
         b.classList.remove('active');
-        if(['chat','discover','stats','settings'][i]===p)b.classList.add('active');
+        if (['chat', 'discover', 'stats', 'settings'][i] === p) b.classList.add('active');
     });
-    if(p==='discover'){S.newSocialCount=0;updateDiscBadge();renderSocialList();}
-    if(p==='stats')renderStats();
-    if(p==='settings')updateSettingsUI();
+    if (p === 'discover') { S.newSocialCount = 0;
+        updateDiscBadge();
+        renderSocialList(); }
+    if (p === 'stats') renderStats();
+    if (p === 'settings') updateSettingsUI();
 }
 
-function switchChatTab(tab){
-    S.chatTab=tab;
-    const tabs=document.querySelectorAll('#page-chat .sub-tabs button');
-    tabs[0].classList.toggle('active',tab==='offline');
-    tabs[1].classList.toggle('active',tab==='wechat');
-    const msgDiv=document.getElementById('chatMessages');
-    const inputArea=document.getElementById('chatInputArea');
-    const btnSend=document.getElementById('btnSend');
-    const wxActions=document.getElementById('wxActions');
-    msgDiv.innerHTML='';
-    if(tab==='wechat'){
+function switchChatTab(tab) {
+    S.chatTab = tab;
+    const tabs = document.querySelectorAll('#page-chat .sub-tabs button');
+    tabs[0].classList.toggle('active', tab === 'offline');
+    tabs[1].classList.toggle('active', tab === 'wechat');
+    const msgDiv = document.getElementById('chatMessages');
+    const inputArea = document.getElementById('chatInputArea');
+    const btnSend = document.getElementById('btnSend');
+    const wxActions = document.getElementById('wxActions');
+    msgDiv.innerHTML = '';
+    if (tab === 'wechat') {
         msgDiv.classList.add('wx');
         inputArea.classList.add('wx');
         btnSend.classList.add('wx');
         wxActions.classList.add('show');
-        document.getElementById('userInput').placeholder='输入消息...';
-        S.wxMessages.forEach(m=>addWxBubble(m));
-    }else{
+        document.getElementById('userInput').placeholder = '输入消息...';
+        S.wxMessages.forEach(m => addWxBubble(m));
+    } else {
         msgDiv.classList.remove('wx');
         inputArea.classList.remove('wx');
         btnSend.classList.remove('wx');
         wxActions.classList.remove('show');
-        document.getElementById('userInput').placeholder='输入云雾敛的台词/动作...';
+        document.getElementById('userInput').placeholder = '输入云雾敛的台词/动作...';
         renderOfflineMsgs();
     }
-    msgDiv.scrollTop=msgDiv.scrollHeight;
+    msgDiv.scrollTop = msgDiv.scrollHeight;
 }
 
-// ═══════════════════════ 渲染消息 ═══════════════════════
-function renderOfflineMsgs(){
-    const div=document.getElementById('chatMessages');
-    S.conversationHistory.forEach(m=>{
-        if(m.role==='assistant'&&!m._wx){
-            const c=cleanAI(m.content);if(c)addOffBubble('char',c);
-        }else if(m.role==='user'&&!m._wx){
-            const t=extractUser(m.content);if(t)addOffBubble('usr',t);
-        }
+// ═══════════════════ 渲染 ═══════════════════
+function renderOfflineMsgs() {
+    const div = document.getElementById('chatMessages');
+    S.conversationHistory.forEach(m => {
+        if (m.role === 'assistant' && !m._wx) { const c = cleanAI(m.content); if (c) addOffBubble('char',
+            c); } else if (m.role === 'user' && !m._wx) { const t = extractUser(m.content); if (t)
+            addOffBubble('usr', t); }
     });
 }
 
-function addOffBubble(role,text){
-    const div=document.getElementById('chatMessages');
-    const b=document.createElement('div');
-    b.className='msg '+role;
-    b.innerHTML=`<div class="sender">${role==='usr'?'📷 云雾敛':'🎤 郁白'}</div><div class="body">${text}</div>`;
+function addOffBubble(role, text) {
+    const div = document.getElementById('chatMessages');
+    const b = document.createElement('div');
+    b.className = 'msg ' + role;
+    b.innerHTML = `<div class="sender">${role==='usr'?'📷 云雾敛':'🎤 郁白'}</div><div class="body">${text}</div>`;
     div.appendChild(b);
-    div.scrollTop=div.scrollHeight;
+    div.scrollTop = div.scrollHeight;
 }
 
-function extractUser(c){const m=c.match(/云雾敛：(.+)$/s);return m?m[1].trim():c.replace(/【.*?】/g,'').trim();}
-function cleanAI(t){return t.replace(/┌──────────── STATUS ────────────┐[\s\S]*?└────────────────────────────────┘/,'').replace(/🌐SOCIAL:[\s\S]*$/,'').trim();}
+function extractUser(c) { const m = c.match(/云雾敛：(.+)$/s); return m ? m[1].trim() : c.replace(/【.*?】/g, '').trim(); }
 
-// ═══════════════════════ 微信消息 ═══════════════════════
-function addWxBubble(m){
-    const div=document.getElementById('chatMessages');
-    const wrapper=document.createElement('div');
-    wrapper.className='wx-msg '+(m.role==='user'?'me':'you');
-    wrapper.style.alignSelf=m.role==='user'?'flex-end':'flex-start';
-    let h='';
-    if(m.time)h+=`<div style="text-align:center;margin:6px 0;"><span class="wx-time">${m.time}</span></div>`;
-    if(m.role==='assistant')h+=`<div class="wx-header">🎤 郁白·${m.device||'iPhone在线'}</div>`;
-    if(m.type==='transfer'){
-        const colors={pending:'#2EAA6E',paid:'#60D394',收款:'#EB953A',received:'#F5CBA7',returned:'#F5CBA7'};
-        const labels={pending:'待付款',paid:'✓ 已付款',收款:'待收款',received:'√ 已接收',returned:'↺ 已退还'};
-        h+=`<div class="wx-transfer-card" style="background:${colors[m.transferStatus]||'#2EAA6E'};">${labels[m.transferStatus]||'待付款'}<br><span style="font-size:20px;">¥${m.amount||0}</span><br><span style="font-size:9px;opacity:0.7;">微信转账</span></div>`;
-    }else if(m.type==='voice'){
-        h+=`<div class="wx-voice">🎤 语音消息 ${m.duration||''}"<br><span style="font-size:10px;color:#999;">转写：${m.text||''}</span></div>`;
-    }else if(m.type==='video'){
-        h+=`<div style="background:#fff;border-radius:4px;padding:10px;">📹 视频通话 · ${m.videoStatus||'结束'} · 时长 ${m.duration||'00:00'}</div>`;
-    }else if(m.type==='image'){
-        h+=`<div style="background:#fff;border-radius:4px;padding:10px;">📷 照片<br><span style="font-size:10px;color:#999;">${m.imageDesc||''}</span></div>`;
-    }else if(m.type==='system'){
-        h+=`<div class="wx-system">${m.text||''}</div>`;
-    }else{
-        h+=`<div class="wx-bubble">${m.text||''}</div>`;
+function cleanAI(t) { return t.replace(/┌──────────── STATUS ────────────┐[\s\S]*?└────────────────────────────────┘/,
+        '').replace(/🌐SOCIAL:[\s\S]*$/, '').trim(); }
+
+function addWxBubble(m) {
+    const div = document.getElementById('chatMessages');
+    const wrapper = document.createElement('div');
+    wrapper.className = 'wx-msg ' + (m.role === 'user' ? 'me' : 'you');
+    wrapper.style.alignSelf = m.role === 'user' ? 'flex-end' : 'flex-start';
+    let h = '';
+    if (m.time) h +=
+        `<div style="text-align:center;margin:6px 0;"><span class="wx-time">${m.time}</span></div>`;
+    if (m.role === 'assistant') h +=
+    `<div class="wx-header">🎤 郁白·${m.device||'iPhone在线'}</div>`;
+    if (m.type === 'transfer') {
+        const colors = { pending: '#2EAA6E', paid: '#60D394', '收款': '#EB953A', received: '#F5CBA7',
+            returned: '#F5CBA7' };
+        const labels = { pending: '待付款', paid: '✓已付款', '收款': '待收款', received: '√已接收',
+            returned: '↺已退还' };
+        h +=
+            `<div class="wx-transfer-card" style="background:${colors[m.transferStatus]||'#2EAA6E'};">${labels[m.transferStatus]||'待付款'}<br><span style="font-size:20px;">¥${m.amount||0}</span><br><span style="font-size:9px;opacity:.7;">微信转账</span></div>`;
+    } else if (m.type === 'voice') {
+        h +=
+            `<div class="wx-voice">🎤语音消息 ${m.duration||''}"<br><span style="font-size:10px;color:#999;">转写：${m.text||''}</span></div>`;
+    } else if (m.type === 'video') {
+        h +=
+            `<div style="background:#fff;border-radius:4px;padding:10px;">📹视频通话·${m.videoStatus||'结束'}·时长${m.duration||'00:00'}</div>`;
+    } else if (m.type === 'image') {
+        h +=
+        `<div style="background:#fff;border-radius:4px;padding:10px;">📷照片<br><span style="font-size:10px;color:#999;">${m.imageDesc||''}</span></div>`;
+    } else if (m.type === 'system') {
+        h += `<div class="wx-system">${m.text||''}</div>`;
+    } else {
+        h += `<div class="wx-bubble">${m.text||''}</div>`;
     }
-    if(m.translation)h+=`<div class="wx-trans">【${m.translation}】</div>`;
-    if(m.ip)h+=`<div class="wx-ip">🌐 IP属地：${m.ip}</div>`;
-    wrapper.innerHTML=h;
+    if (m.translation) h += `<div class="wx-trans">【${m.translation}】</div>`;
+    if (m.ip) h += `<div class="wx-ip">🌐IP属地：${m.ip}</div>`;
+    wrapper.innerHTML = h;
     div.appendChild(wrapper);
-    div.scrollTop=div.scrollHeight;
+    div.scrollTop = div.scrollHeight;
 }
 
-// ═══════════════════════ 发送消息 ═══════════════════════
-async function sendMessage(){
-    const settings=getAPISettings();
-    if(!settings.apiKey){openModal('apiModal');showToast('⚠️ 请先设置 API Key');return;}
-    const input=document.getElementById('userInput');
-    const userText=input.value.trim();
-    if(!userText)return;
-    input.value='';input.style.height='auto';
-
-    const isWx=S.chatTab==='wechat';
-    const now=getNowTime();
-
-    if(isWx){
-        const wxMsg={role:'user',text:userText,time:now,device:'iPhone在线',ip:'浙江',type:'text'};
-        S.wxMessages.push(wxMsg);addWxBubble(wxMsg);
-        const ctx=`【微信聊天模式。好感${S.affection}/100 信任${S.trust}/100 亲密${S.intimacy}/100 曝光${S.exposure}/100。你是郁白，中韩混血，公开说韩语私下说中文。微信聊天用中文为主，偶尔韩语要附翻译。】\n\n云雾敛发来微信：${userText}`;
-        S.conversationHistory.push({role:'user',content:ctx,_wx:true});
-    }else{
-        addOffBubble('usr',userText);
-        const ctx=`【${S.location}。NPC：${S.npcs.join('、')}。隐私：${S.privacy}。好感${S.affection}/100 信任${S.trust}/100 亲密${S.intimacy}/100 曝光${S.exposure}/100。暗面：${S.flags.dark?'活跃':'关闭'} 忘本：${S.flags.wangben?'活跃':'关闭'}】\n\n云雾敛：${userText}`;
-        S.conversationHistory.push({role:'user',content:ctx,_wx:false});
+// ═══════════════════ 发送消息 ═══════════════════
+async function sendMessage() {
+    const settings = getAPISettings();
+    if (!settings.apiKey) { openModal('apiModal');
+        showToast('⚠️请先设置API Key'); return; }
+    const input = document.getElementById('userInput');
+    const userText = input.value.trim();
+    if (!userText) return;
+    input.value = '';
+    input.style.height = 'auto';
+    const isWx = S.chatTab === 'wechat';
+    const now = getNowTime();
+    if (isWx) {
+        const wxMsg = { role: 'user', text: userText, time: now, device: 'iPhone在线', ip: '浙江', type: 'text' };
+        S.wxMessages.push(wxMsg);
+        addWxBubble(wxMsg);
+        const ctx =
+            `【微信聊天。好感${S.affection}/100 信任${S.trust}/100 亲密${S.intimacy}/100 曝光${S.exposure}/100。你是郁白，中韩混血，公开说韩语私下说中文。】\n\n云雾敛发来微信：${userText}`;
+        S.conversationHistory.push({ role: 'user', content: ctx, _wx: true });
+    } else {
+        addOffBubble('usr', userText);
+        const ctx =
+            `【${S.location}。NPC：${S.npcs.join('、')}。隐私：${S.privacy}。好感${S.affection}/100 信任${S.trust}/100 亲密${S.intimacy}/100 曝光${S.exposure}/100。暗面：${S.flags.dark?'活跃':'关闭'} 忘本：${S.flags.wangben?'活跃':'关闭'}】\n\n云雾敛：${userText}`;
+        S.conversationHistory.push({ role: 'user', content: ctx, _wx: false });
     }
-
-    if(S.conversationHistory.length>60){const sys=S.conversationHistory[0];S.conversationHistory=[sys,...S.conversationHistory.slice(-50)];}
-
+    if (S.conversationHistory.length > 60) { const sys = S.conversationHistory[0];
+        S.conversationHistory = [sys, ...S.conversationHistory.slice(-50)]; }
     showTyping(isWx);
-    document.getElementById('btnSend').disabled=true;
-
-    try{
-        const resp=await fetch(settings.apiBase+'/chat/completions',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','Authorization':'Bearer '+settings.apiKey},
-            body:JSON.stringify({model:settings.model,messages:S.conversationHistory,temperature:0.85,max_tokens:2500})
+    document.getElementById('btnSend').disabled = true;
+    try {
+        const resp = await fetch(settings.apiBase + '/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + settings.apiKey },
+            body: JSON.stringify({ model: settings.model, messages: S.conversationHistory,
+                temperature: 0.85, max_tokens: 2500 })
         });
-        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${resp.status}`);}
-        const data=await resp.json();
-        const aiText=data.choices[0].message.content;
-        S.conversationHistory.push({role:'assistant',content:aiText,_wx:isWx});
+        if (!resp.ok) { const e = await resp.json().catch(() => ({})); throw new Error(e.error?.message ||
+                `HTTP ${resp.status}`); }
+        const data = await resp.json();
+        const aiText = data.choices[0].message.content;
+        S.conversationHistory.push({ role: 'assistant', content: aiText, _wx: isWx });
         hideTyping();
         updateFromAI(aiText);
-
-        if(isWx){
-            const replies=parseWxReply(aiText);
-            replies.forEach(r=>{S.wxMessages.push(r);addWxBubble(r);});
-            if(Math.random()<0.3)genRandomSocial();
-        }else{
-            const c=cleanAI(aiText);if(c)addOffBubble('char',c);
-            if(aiText.includes('🌐新社交动态:有')||Math.random()<0.25)genRandomSocial();
+        if (isWx) {
+            const replies = parseWxReply(aiText);
+            replies.forEach(r => { S.wxMessages.push(r);
+                addWxBubble(r); });
+            if (Math.random() < 0.3) genRandomSocial();
+        } else {
+            const c = cleanAI(aiText); if (c) addOffBubble('char', c);
+            if (aiText.includes('🌐新社交动态:有') || Math.random() < 0.25) genRandomSocial();
         }
-    }catch(err){
+    } catch (err) {
         hideTyping();
-        if(isWx){const em={role:'assistant',text:'⚠️ '+err.message,time:now,type:'system'};S.wxMessages.push(em);addWxBubble(em);}
-        else addOffBubble('char','⚠️ 出错：'+err.message);
+        if (isWx) { const em = { role: 'assistant', text: '⚠️' + err.message, time: now, type: 'system' };
+            S.wxMessages.push(em);
+            addWxBubble(em); } else addOffBubble('char', '⚠️出错：' + err.message);
     }
-    document.getElementById('btnSend').disabled=false;
+    document.getElementById('btnSend').disabled = false;
     document.getElementById('userInput').focus();
 }
 
-function parseWxReply(aiText){
-    const replies=[];
-    const clean=aiText.replace(/┌──────────── STATUS ────────────┐[\s\S]*?└────────────────────────────────┘/,'').trim();
-    const lines=clean.split('\n').filter(l=>l.trim());
-    lines.forEach(line=>{
-        let text=line.trim();let translation='';
-        const tm=text.match(/【(.+?)】/);if(tm){translation=tm[1];text=text.replace(/【.+?】/,'').trim();}
-        replies.push({role:'assistant',text:text||line,translation,time:getNowTime(),device:'iPhone在线',ip:'韩国',type:'text'});
-    });
-    if(replies.length===0)replies.push({role:'assistant',text:clean,time:getNowTime(),device:'iPhone在线',ip:'韩国',type:'text'});
+function parseWxReply(aiText) {
+    const replies = [];
+    const clean = aiText.replace(/┌──────────── STATUS ────────────┐[\s\S]*?└────────────────────────────────┘/,
+        '').trim();
+    const lines = clean.split('\n').filter(l => l.trim());
+    lines.forEach(line => { let text = line.trim();
+        let translation = ''; const tm = text.match(/【(.+?)】/); if (tm) { translation = tm[1];
+            text = text.replace(/【.+?】/, '').trim(); }
+        replies.push({ role: 'assistant', text: text || line, translation, time: getNowTime(),
+            device: 'iPhone在线', ip: '韩国', type: 'text' }); });
+    if (replies.length === 0) replies.push({ role: 'assistant', text: clean, time: getNowTime(),
+        device: 'iPhone在线', ip: '韩国', type: 'text' });
     return replies;
 }
 
-function showTyping(wx){
-    const div=document.getElementById('chatMessages');
-    const el=document.createElement('div');el.id='typingIndicator';el.className='typing-dots';
-    if(wx)el.style.background='#fff';
-    el.innerHTML='<span></span><span></span><span></span>';
-    div.appendChild(el);div.scrollTop=div.scrollHeightfunction hideTyping(){const el=document.getElementById('typingIndicator');if(el)el.remove();}
-function getNowTime(){const n=new Date();return `${String(n.getMonth()+1).padStart(2,'0')}.${String(n.getDate()).padStart(2,'0')} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
+function showTyping(wx) { const div = document.getElementById('chatMessages'); const el = document.createElement(
+        'div');
+    el.id = 'typingIndicator';
+    el.className = 'typing-dots'; if (wx) el.style.background = '#fff';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    div.appendChild(el);
+    div.scrollTop = div.scrollHeight; }
 
-// ═══════════════════════ 微信快捷操作 ═══════════════════════
-function wxQuick(action){
-    const input=document.getElementById('userInput');
-    switch(action){
-        case 'voice':input.value='[发了一条语音消息]';break;
-        case 'image':input.value='[发了一张照片]';break;
-        case 'video':input.value='[发起视频通话]';break;
-        case 'call':input.value='[打电话]';break;
-        case 'transfer':input.value='[转账500元]';break;
-        case 'moments':input.value='[发朋友圈]';break;
-    }
-    sendMessage();
-}
+function hideTyping() { const el = document.getElementById('typingIndicator'); if (el) el.remove(); }
 
-// ═══════════════════════ 状态更新 ═══════════════════════
-function updateFromAI(text){
-    const sm=text.match(/💗好感:(\d+)\/100.*?🔒信任:(\d+)\/100.*?💫亲密:(\d+)\/100.*?📸曝光:(\d+)\/100/s);
-    if(sm){if(!isNaN(+sm[1]))S.affection=+sm[1];if(!isNaN(+sm[2]))S.trust=+sm[2];if(!isNaN(+sm[3]))S.intimacy=+sm[3];if(!isNaN(+sm[4]))S.exposure=+sm[4];}
-    const dm=text.match(/暗面:(开|关)/),wm=text.match(/忘本:(活跃|关)/),im=text.match(/亲密:(开|关)/);
-    if(dm)S.flags.dark=dm[1]==='开';if(wm)S.flags.wangben=wm[1]==='活跃';if(im)S.flags.intimacy_scene=im[1]==='开';
-}
+function getNowTime() { const n = new Date(); return `${String(n.getMonth()+1).padStart(2,'0')}.${String(n.getDate()).padStart(2,'0')} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; }
 
-function renderStats(){
-    document.getElementById('statsCard').innerHTML=`
-    <div class="stat-row"><span class="sl">📅 周次</span><span class="sv">${S.week}·${S.day}</span></div>
-    <div class="stat-row"><span class="sl">💗 好感度</span><span class="sv" style="color:#2ecc71;">${S.affection}/100</span></div>
-    <div class="mini-bar"><div class="mini-bar-fill" style="width:${S.affection}%;background:#2ecc71;"></div></div>
-    <div class="stat-row"><span class="sl">🔒 信任度</span><span class="sv" style="color:#2ecc71;">${S.trust}/100</span></div>
-    <div class="mini-bar"><div class="mini-bar-fill" style="width:${S.trust}%;background:#2ecc71;"></div></div>
-    <div class="stat-row"><span class="sl">💫 亲密度</span><span class="sv" style="color:#2ecc71;">${S.intimacy}/100</span></div>
-    <div class="mini-bar"><div class="mini-bar-fill" style="width:${S.intimacy}%;background:#2ecc71;"></div></div>
-    <div class="stat-row"><span class="sl">📸 曝光风险</span><span class="sv" style="color:#f39c12;">${S.exposure}/100 ${S.exposure<20?'🟢':S.exposure<40?'🟡':S.exposure<60?'🟠':S.exposure<80?'🔴':'⚫'}</span></div>
-    <div class="mini-bar"><div class="mini-bar-fill" style="width:${S.exposure}%;background:#f39c12;"></div></div>
-    <div class="stat-row"><span class="sl">📍 位置</span><span class="sv">${S.location}</span></div>`;
-    document.getElementById('flagsCard').innerHTML=`
-    <div class="stat-row"><span>暗面</span><span class="tag ${S.flags.dark?'tag-on':'tag-off'}">${S.flags.dark?'活跃':'关闭'}</span></div>
-    <div class="stat-row"><span>忘本暗爽</span><span class="tag ${S.flags.wangben?'tag-on':'tag-off'}">${S.flags.wangben?'活跃':'关闭'}</span></div>
-    <div class="stat-row"><span>亲密场景</span><span class="tag ${S.flags.intimacy_scene?'tag-on':'tag-off'}">${S.flags.intimacy_scene?'活跃':'关闭'}</span></div>`;
-    document.getElementById('eventsCard').innerHTML=S.events.map(e=>`<div style="font-size:10px;color:var(--text2);padding:2px 0;">• ${e}</div>`).join('');
-}
+function wxQuick(action) { const input = document.getElementById('userInput'); switch (action) { case 'voice':
+            input.value = '[发了一条语音消息]'; break; case 'image':
+            input.value = '[发了一张照片]'; break; case 'video':
+            input.value = '[发起视频通话]'; break; case 'call':
+            input.value = '[打电话]'; break; case 'transfer':
+            input.value = '[转账500元]'; break; case 'moments':
+            input.value = '[发朋友圈]'; break; }
+    sendMessage(); }
 
-function updateSettingsUI(){
-    const s=getAPISettings();
-    document.getElementById('apiStatus').textContent=s.apiKey?'✅ 已配置 ('+s.provider+')':'⚠️ 未配置 - 点击设置';
-}
+// ═══════════════════ 状态 ═══════════════════
+function updateFromAI(text) { const sm = text.match(
+        /💗好感:(\d+)\/100.*?🔒信任:(\d+)\/100.*?💫亲密:(\d+)\/100.*?📸曝光:(\d+)\/100/s); if (sm) { if (
+            !isNaN(+sm[1])) S.affection = +sm[1]; if (!isNaN(+sm[2])) S.trust = +sm[2]; if (!isNaN(+sm[
+            3])) S.intimacy = +sm[3]; if (!isNaN(+sm[4])) S.exposure = +sm[4]; } const dm = text.match(
+            /暗面:(开|关)/),
+        wm = text.match(/忘本:(活跃|关)/), im = text.match(/亲密:(开|关)/); if (dm) S.flags.dark = dm[1] ===
+        '开'; if (wm) S.flags.wangben = wm[1] === '活跃'; if (im) S.flags.intimacy_scene = im[1] === '开'; }
 
-// ═══════════════════════ 社交动态 ═══════════════════════
-function initSocialFeed(){
-    S.socialFeed=[
-        {id:1,platform:'🧣 微博',user:'郁白守护小队',handle:'@yubai_protect',avatar:'🛡️',body:'今天的签售会repo！哥哥状态好好😭 那个新来的女助理怎么一直在他身边晃啊……不过看起来挺专业的，算了不狙了',time:'30分钟前',stats:'👍1.2k 🔄89 💬204'},
-        {id:2,platform:'🐦 Twitter',user:'YB Global Fanbase',handle:'@yubai_global',avatar:'🌏',body:'Yu Bai at fansign today — look at this visual ✨ Our king is glowing! Also spotted a new female assistant following him closely.',time:'45分钟前',stats:'♥8.4k 🔁1.2k 💬356'},
-        {id:3,platform:'📸 Instagram',user:'dispatch_korea',handle:'@dispatch',avatar:'📰',body:'Yu Bai leaving fansign venue. Spotted with 3 staff including one female assistant. Nothing suspicious — yet. 👀',time:'2小时前',stats:'♥23k 💬1.8k'},
-        {id:4,platform:'🧣 微博',user:'今天也骂嫂子',handle:'@hate_sister',avatar:'🤬',body:'姐妹们有没有人扒一下郁白身边那个新助理？长得还挺好看的……不会是……算了不贷款焦虑了',time:'1小时前',stats:'👍3.2k 🔄120 💬567'},
-        {id:5,platform:'📚 豆瓣',user:'已注销',handle:'韩娱小组',avatar:'📚',body:'【讨论】郁白新助理什么来头？有没有人知道她是什么时候开始跟的？感觉最近出镜频率有点高……',time:'2小时前',stats:'👍892 💬345',douban:true,group:'韩娱吃瓜基地',comments:[{user:'吃瓜路人',text:'好像叫云雾敛？之前有人扒过'},{user:'唯粉心碎',text:'别瞎猜了就是工作人员，别给哥哥造谣'},{user:'清醒路人',text:'长得确实好看……助理颜值都能出道了'}]},
-        {id:6,platform:'🟢 朋友圈',user:'队友金在允',handle:'',avatar:'🐶',body:'今天签售结束后的后台。某人在偷吃零食被抓包了。有图但不给你们看🤫',time:'15分钟前',stats:'❤️队长, 造型师Noona, 郁白',moments:true},
-    ];
-}
+function renderStats() { document.getElementById('statsCard').innerHTML = `
+<div class="stat-row"><span class="sl">📅周次</span><span class="sv">${S.week}·${S.day}</span></div>
+<div class="stat-row"><span class="sl">💗好感度</span><span class="sv" style="color:#2ecc71">${S.affection}/100</span></div>
+<div class="mini-bar"><div class="mini-bar-fill" style="width:${S.affection}%;background:#2ecc71"></div></div>
+<div class="stat-row"><span class="sl">🔒信任度</span><span class="sv" style="color:#2ecc71">${S.trust}/100</span></div>
+<div class="mini-bar"><div class="mini-bar-fill" style="width:${S.trust}%;background:#2ecc71"></div></div>
+<div class="stat-row"><span class="sl">💫亲密度</span><span class="sv" style="color:#2ecc71">${S.intimacy}/100</span></div>
+<div class="mini-bar"><div class="mini-bar-fill" style="width:${S.intimacy}%;background:#2ecc71"></div></div>
+<div class="stat-row"><span class="sl">📸曝光风险</span><span class="sv" style="color:#f39c12">${S.exposure}/100 ${S.exposure<20?'🟢':S.exposure<40?'🟡':S.exposure<60?'🟠':S.exposure<80?'🔴':'⚫'}</span></div>
+<div class="mini-bar"><div class="mini-bar-fill" style="width:${S.exposure}%;background:#f39c12"></div></div>
+<div class="stat-row"><span class="sl">📍位置</span><span class="sv">${S.location}</span></div>`; document.getElementById(
+        'flagsCard').innerHTML = `
+<div class="stat-row"><span>暗面</span><span class="tag ${S.flags.dark?'tag-on':'tag-off'}">${S.flags.dark?'活跃':'关闭'}</span></div>
+<div class="stat-row"><span>忘本暗爽</span><span class="tag ${S.flags.wangben?'tag-on':'tag-off'}">${S.flags.wangben?'活跃':'关闭'}</span></div>
+<div class="stat-row"><span>亲密场景</span><span class="tag ${S.flags.intimacy_scene?'tag-on':'tag-off'}">${S.flags.intimacy_scene?'活跃':'关闭'}</span></div>`; document.getElementById('eventsCard').innerHTML = S.events.map(
+        e => `<div style="font-size:10px;color:var(--text2);padding:2px 0">•${e}</div>`).join(''); }
 
-function genRandomSocial(){
-    const posts=[
-        {platform:'🧣 微博',user:'路人追星号',avatar:'👀',body:'在江南区偶遇郁白了……真人好高……旁边跟着一个女助理在帮他拿咖啡',time:'刚刚',stats:'👍892 🔄45 💬132'},
-        {platform:'🐦 Twitter',user:'kpop_updates',avatar:'🔔',body:'Rumor: Dispatch might drop their annual Jan 1 couple reveal early this year. Who will it be? 👀🍿',time:'刚刚',stats:'♥15k 🔁4.2k 💬2.1k'},
-        {platform:'🧣 微博',user:'Four.Y更新了吗',avatar:'📷',body:'Four.Y大大又半个月没更新了……站子还在但是基本不更图。大大是不是真的脱粉了😢',time:'刚刚',stats:'👍456 🔄12 💬89'},
-        {platform:'📸 Instagram',user:'yubai_fanpage',avatar:'💜',body:'New airport preview! Yu Bai spotted at Gimpo heading to... Shanghai? Our filial king 👑',time:'刚刚',stats:'♥5.2k 💬234'},
-    ];
-    const p=posts[Math.floor(Math.random()*posts.length)];
-    S.socialFeed.unshift({...p,id:Date.now(),isNew:true});
-    if(S.socialFeed.length>30)S.socialFeed=S.socialFeed.slice(0,30);
+function updateSettingsUI() { const s = getAPISettings(); document.getElementById('apiStatus').textContent = s
+        .apiKey ? '✅已配置(' + s.provider + ')' : '⚠️未配置-点击设置'; }
+
+// ═══════════════════ 社交 ═══════════════════
+function initSocialFeed() { S.socialFeed = [{ id: 1, platform: '🧣微博', user: '郁白守护小队',
+        handle: '@yubai_protect', avatar: '🛡️',
+        body: '今天的签售会repo！哥哥状态好好😭那个新来的女助理怎么一直在他身边晃啊……不过看起来挺专业的，算了不狙了',
+        time: '30分钟前', stats: '👍1.2k🔄89💬204' }, { id: 2, platform: '🐦Twitter', user: 'YB Global Fanbase',
+        handle: '@yubai_global', avatar: '🌏',
+        body: 'Yu Bai at fansign today — look at this visual ✨ Our king is glowing! Also spotted a new female assistant following him closely.',
+        time: '45分钟前', stats: '♥8.4k🔁1.2k💬356' }, { id: 3, platform: '📸Instagram', user: 'dispatch_korea',
+        handle: '@dispatch', avatar: '📰',
+        body: 'Yu Bai leaving fansign venue. Spotted with 3 staff including one female assistant. Nothing suspicious — yet. 👀',
+        time: '2小时前', stats: '♥23k💬1.8k' }, { id: 4, platform: '🧣微博', user: '今天也骂嫂子',
+        handle: '@hate_sister', avatar: '🤬',
+        body: '姐妹们有没有人扒一下郁白身边那个新助理？长得还挺好看的……不会是……算了不贷款焦虑了', time: '1小时前',
+        stats: '👍3.2k🔄120💬567' }, { id: 5, platform: '📚豆瓣', user: '已注销', handle: '韩娱小组', avatar: '📚',
+        body: '【讨论】郁白新助理什么来头？有没有人知道她是什么时候开始跟的？感觉最近出镜频率有点高……', time: '2小时前',
+        stats: '👍892💬345', douban: true, group: '韩娱吃瓜基地', comments: [{ user: '吃瓜路人',
+            text: '好像叫云雾敛？之前有人扒过' }, { user: '唯粉心碎', text: '别瞎猜了就是工作人员，别给哥哥造谣' },
+        { user: '清醒路人', text: '长得确实好看……助理颜值都能出道了' }] }, { id: 6, platform: '🟢朋友圈',
+        user: '队友金在允', handle: '', avatar: '🐶', body: '今天签售结束后的后台。某人在偷吃零食被抓包了。有图但不给你们看🤫',
+        time: '15分钟前', stats: '❤️队长,造型师Noona,郁白', moments: true }]; }
+
+function genRandomSocial() { const posts = [{ platform: '🧣微博', user: '路人追星号', avatar: '👀',
+            body: '在江南区偶遇郁白了……真人好高……旁边跟着一个女助理在帮他拿咖啡', time: '刚刚',
+        stats: '👍892🔄45💬132' }, { platform: '🐦Twitter', user: 'kpop_updates', avatar: '🔔',
+        body: 'Rumor: Dispatch might drop their annual Jan 1 couple reveal early this year. Who will it be? 👀🍿',
+        time: '刚刚', stats: '♥15k🔁4.2k💬2.1k' }, { platform: '🧣微博', user: 'Four.Y更新了吗', avatar: '📷',
+        body: 'Four.Y大大又半个月没更新了……站子还在但是基本不更图。大大是不是真的脱粉了😢', time: '刚刚',
+        stats: '👍456🔄12💬89' }, { platform: '📸Instagram', user: 'yubai_fanpage', avatar: '💜',
+        body: 'New airport preview! Yu Bai spotted at Gimpo heading to... Shanghai? Our filial king 👑',
+        time: '刚刚', stats: '♥5.2k💬234' }]; const p = posts[Math.floor(Math.random() * posts.length)];
+    S.socialFeed.unshift({ ...p, id: Date.now(), isNew: true }); if (S.socialFeed.length > 30) S.socialFeed = S
+        .socialFeed.slice(0, 30);
     S.newSocialCount++;
     updateDiscBadge();
-    setTimeout(()=>{p.isNew=false;updateDiscBadge();},5000);
-}
+    setTimeout(() => { p.isNew = false;
+        updateDiscBadge(); }, 5000); }
 
-function updateDiscBadge(){
-    const badge=document.getElementById('discBadge');
-    badge.style.display=(S.newSocialCount>0&&S.currentPage!=='discover')?'block':'none';
-}
+function updateDiscBadge() { const badge = document.getElementById('discBadge');
+    badge.style.display = (S.newSocialCount > 0 && S.currentPage !== 'discover') ? 'block' : 'none'; }
 
-function renderSocialList(){
-    const container=document.getElementById('socialFeedContainer');
-    if(!S.socialFeed.length){container.innerHTML='<div style="text-align:center;color:var(--text2);padding:20px;">暂无动态</div>';return;}
-    container.innerHTML=S.socialFeed.map(p=>`
-    <div class="social-post${p.isNew?' new':''}">
-    <div class="ph"><div class="pa">${p.avatar}</div><div><div class="pu">${p.user}</div><div class="phn">${p.handle||''}</div></div><div class="pp">${p.platform}</div></div>
-    ${p.douban&&p.group?`<div style="font-size:9px;color:#6ba346;margin-bottom:4px;">📚 ${p.group}</div>`:''}
-    <div class="pb">${p.body}</div>
-    ${p.douban&&p.comments?`<div style="background:var(--surface);border-radius:6px;padding:8px;margin-top:6px;">${p.comments.map(c=>`<div class="douban-comment"><span class="cu">${c.user}</span>: ${c.text}</div>`).join('')}</div>`:''}
-    <div class="pst">${p.stats}</div><div class="pti">${p.time}</div>
-    </div>`).join('');
-}
+function renderSocialList() { const container = document.getElementById('socialFeedContainer'); if (!S.socialFeed
+        .length) { container.innerHTML =
+        '<div style="text-align:center;color:var(--text2);padding:20px">暂无动态</div>'; return; }
+    container.innerHTML = S.socialFeed.map(p => `
+<div class="social-post${p.isNew?' new':''}">
+<div class="ph"><div class="pa">${p.avatar}</div><div><div class="pu">${p.user}</div><div class="phn">${p.handle||''}</div></div><div class="pp">${p.platform}</div></div>
+${p.douban&&p.group?`<div style="font-size:9px;color:#6ba346;margin-bottom:4px">📚${p.group}</div>`:''}
+<div class="pb">${p.body}</div>
+${p.douban&&p.comments?`<div style="background:var(--surface);border-radius:6px;padding:8px;margin-top:6px">${p.comments.map(c=>`<div style="padding:3px 0;font-size:10px;border-bottom:1px solid rgba(255,255,255,.03)"><span style="color:#6ba346;font-weight:600">${c.user}</span>:${c.text}</div>`).join('')}</div>`:''}
+<div class="pst">${p.stats}</div><div class="pti">${p.time}</div>
+</div>`).join(''); }
 
-function openSocial(platform){
-    const content=document.getElementById('socialModalContent');
-    const filtered=S.socialFeed.filter(p=>{
-        if(platform==='weibo')return p.platform.includes('微博');
-        if(platform==='twitter')return p.platform.includes('Twitter');
-        if(platform==='instagram')return p.platform.includes('Instagram');
-        if(platform==='douban')return p.platform.includes('豆瓣');
-        if(platform==='moments')return p.platform.includes('朋友圈');
-        return true;
-    });
-    let html=`<h3>${platform==='weibo'?'🧣 微博':platform==='twitter'?'🐦 Twitter':platform==='instagram'?'📸 Instagram':platform==='douban'?'📚 豆瓣':'🟢 朋友圈'} 实时动态</h3>`;
-    if(!filtered.length){html+='<p style="color:var(--text2);">暂无动态</p>';}
-    else{
-        filtered.forEach(p=>{
-            html+=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;margin:6px 0;font-size:11px;${p.isNew?'border-left:2px solid var(--accent);':''}">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span style="font-size:18px;">${p.avatar}</span><span style="font-weight:700;color:#fff;">${p.user}</span><span style="font-size:9px;color:var(--text2);">${p.handle||''}</span><span style="margin-left:auto;font-size:9px;color:var(--accent);">${p.platform}</span></div>`;
-            if(p.douban&&p.group)html+=`<div style="font-size:9px;color:#6ba346;margin-bottom:4px;">📚 ${p.group}</div>`;
-            html+=`<div style="line-height:1.5;color:var(--text);">${p.body}</div>`;
-            if(p.douban&&p.comments){html+='<div style="background:var(--surface);border-radius:6px;padding:8px;margin-top:6px;">';p.comments.forEach(c=>{html+=`<div style="padding:3px 0;font-size:10px;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#6ba346;font-weight:600;">${c.user}</span>: ${c.text}</div>`;});html+='</div>';}
-            html+=`<div style="display:flex;gap:12px;font-size:10px;color:var(--text2);margin-top:4px;">${p.stats}</div><div style="font-size:9px;color:#555;">${p.time}</div></div>`;
-        });
-    }
-    content.innerHTML=html;
-    openModal('socialModal');
-}
+function openSocial(platform) { const content = document.getElementById('socialModalContent'); const filtered = S
+        .socialFeed.filter(p => { if (platform === 'weibo') return p.platform.includes('微博'); if (platform ===
+                'twitter') return p.platform.includes('Twitter'); if (platform === 'instagram') return p.platform
+            .includes('Instagram'); if (platform === 'douban') return p.platform.includes('豆瓣'); if (platform ===
+            'moments') return p.platform.includes('朋友圈'); return true; }); let html =
+        `<h3>${platform==='weibo'?'🧣微博':platform==='twitter'?'🐦Twitter':platform==='instagram'?'📸Instagram':platform==='douban'?'📚豆瓣':'🟢朋友圈'}实时动态</h3>`;
+    if (!filtered.length) { html += '<p style="color:var(--text2)">暂无动态</p>'; } else { filtered.forEach(p => {
+            html +=
+                `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;margin:6px 0;font-size:11px;${p.isNew?'border-left:2px solid var(--accent)':''}"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:18px">${p.avatar}</span><span style="font-weight:700;color:#fff">${p.user}</span><span style="font-size:9px;color:var(--text2)">${p.handle||''}</span><span style="margin-left:auto;font-size:9px;color:var(--accent)">${p.platform}</span></div>`;
+            if (p.douban && p.group) html +=
+                `<div style="font-size:9px;color:#6ba346;margin-bottom:4px">📚${p.group}</div>`;
+            html += `<div style="line-height:1.5;color:var(--text)">${p.body}</div>`;
+            if (p.douban && p.comments) { html +=
+                    '<div style="background:var(--surface);border-radius:6px;padding:8px;margin-top:6px">';
+                p.comments.forEach(c => { html +=
+                        `<div style="padding:3px 0;font-size:10px;border-bottom:1px solid rgba(255,255,255,.03)"><span style="color:#6ba346;font-weight:600">${c.user}</span>:${c.text}</div>`; });
+                html += '</div>'; }
+            html +=
+                `<div style="display:flex;gap:12px;font-size:10px;color:var(--text2);margin-top:4px">${p.stats}</div><div style="font-size:9px;color:#555">${p.time}</div></div>`;
+        }); }
+    content.innerHTML = html;
+    openModal('socialModal'); }
 
-// ═══════════════════════ API 设置 ═══════════════════════
-function getAPISettings(){const s=localStorage.getItem('kpop_sim_v4_settings');if(s)return JSON.parse(s);return{provider:'deepseek',apiKey:'',apiBase:'https://api.deepseek.com/v1',model:'deepseek-chat'};}
-function saveAPISettingsToStorage(s){localStorage.setItem('kpop_sim_v4_settings',JSON.stringify(s));}
-function onProvChange(){const p=document.getElementById('apiProvider').value;if(p==='deepseek'){document.getElementById('apiBase').value='https://api.deepseek.com/v1';document.getElementById('modelName').value='deepseek-chat';}else if(p==='openai'){document.getElementById('apiBase').value='https://api.openai.com/v1';document.getElementById('modelName').value='gpt-4o';}}
-function saveAPISettings(){
-    const s={provider:document.getElementById('apiProvider').value,apiKey:document.getElementById('apiKey').value.trim(),apiBase:document.getElementById('apiBase').value.trim(),model:document.getElementById('modelName').value.trim()};
-    saveAPISettingsToStorage(s);closeModal('apiModal');updateSettingsUI();showToast('✅ API 设置已保存！');
-}
+// ═══════════════════ API设置 ═══════════════════
+function getAPISettings() { const s = localStorage.getItem('kpop_sim_v4_settings'); if (s) return JSON.parse(s); return {
+        provider: 'deepseek', apiKey: '', apiBase: 'https://api.deepseek.com/v1', model: 'deepseek-chat' }; }
 
-// ═══════════════════════ 数据导入导出 ═══════════════════════
-function exportData(){
-    const data={version:'4.0',exportedAt:new Date().toISOString(),state:{affection:S.affection,trust:S.trust,intimacy:S.intimacy,exposure:S.exposure,week:S.week,day:S.day,location:S.location,npcs:S.npcs,privacy:S.privacy,flags:S.flags,events:S.events,chatTab:S.chatTab},conversationHistory:S.conversationHistory.map(m=>({role:m.role,content:m.content,_wx:m._wx||false})),wxMessages:S.wxMessages,socialFeed:S.socialFeed};
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    const url=URL.createObjectURL(blob);const a=document.createElement('a');
-    a.href=url;a.download=`kpop-sim-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();
-    URL.revokeObjectURL(url);showToast('📤 数据已导出！');
-}
-function importData(event){
-    const file=event.target.files[0];if(!file)return;
-    const reader=new FileReader();
-    reader.onload=function(e){
-        try{
-            const data=JSON.parse(e.target.result);
-            if(data.version&&data.state){
-                Object.assign(S,data.state);S.flags=data.state.flags||{dark:false,wangben:true,intimacy_scene:false};
-                S.conversationHistory=data.conversationHistory||[];S.wxMessages=data.wxMessages||[];S.socialFeed=data.socialFeed||[];
-                if(S.conversationHistory.length===0||S.conversationHistory[0].role!=='system')S.conversationHistory.unshift({role:'system',content:buildSP()});
-                switchChatTab(S.chatTab||'offline');renderStats();updateSettingsUI();updateDiscBadge();showToast('📥 数据导入成功！');
-            }else{showToast('⚠️ 无效的备份文件');}
-        }catch(err){showToast('⚠️ 文件解析失败：'+err.message);}
-    };
-    reader.readAsText(file);event.target.value='';
-}
-function resetAll(){
-    if(!confirm('确定要重置全部数据吗？此操作不可恢复！\n\n建议先导出备份。'))return;
-    S.affection=92;S.trust=88;S.intimacy=90;S.exposure=25;S.location='签售会后台休息室';
-    S.flags={dark:false,wangben:true,intimacy_scene:false};S.events=['下周回归舞台彩排','Dispatch记者近期活跃于江南区'];
-    S.wxMessages=[];S.conversationHistory=[{role:'system',content:buildSP()},{role:'assistant',content:OPENING_OFFLINE,_wx:false}];
-    initSocialFeed();S.newSocialCount=0;
-    switchChatTab('offline');renderStats();updateSettingsUI();updateDiscBadge();
-    document.getElementById('chatMessages').innerHTML='';addOffBubble('char',cleanAI(OPENING_OFFLINE));
-    showToast('🔄 数据已重置');
-}
+function saveAPISettingsToStorage(s) { localStorage.setItem('kpop_sim_v4_settings', JSON.stringify(s)); }
 
-// ═══════════════════════ Toast ═══════════════════════
-function showToast(msg){
-    const existing=document.querySelector('.toast');if(existing)existing.remove();
-    const toast=document.createElement('div');toast.className='toast';toast.textContent=msg;
-    document.body.appendChild(toast);
-    setTimeout(()=>{toast.style.opacity='0';toast.style.transition='opacity 0.3s';setTimeout(()=>toast.remove(),300);},2000);
-}
+function onProvChange() { const p = document.getElementById('apiProvider').value; if (p === 'deepseek') { document
+            .getElementById('apiBase').value = 'https://api.deepseek.com/v1';
+        document.getElementById('modelName').value = 'deepseek-chat'; } else if (p === 'openai') { document
+            .getElementById('apiBase').value = 'https://api.openai.com/v1';
+        document.getElementById('modelName').value = 'gpt-4o'; } }
 
-// ═══════════════════════ 初始化 ═══════════════════════
-function init(){
-    S.conversationHistory=[{role:'system',content:buildSP()},{role:'assistant',content:OPENING_OFFLINE,_wx:false}];
+function saveAPISettings() { const s = { provider: document.getElementById('apiProvider').value, apiKey: document
+            .getElementById('apiKey').value.trim(), apiBase: document.getElementById('apiBase').value.trim(),
+        model: document.getElementById('modelName').value.trim() };
+    saveAPISettingsToStorage(s);
+    closeModal('apiModal');
+    updateSettingsUI();
+    showToast('✅API设置已保存！'); }
+
+// ═══════════════════ 导入导出 ═══════════════════
+function exportData() { const data = { version: '4.0', exportedAt: new Date().toISOString(), state: { affection: S
+                .affection, trust: S.trust, intimacy: S.intimacy, exposure: S.exposure, week: S.week,
+            day: S.day, location: S.location, npcs: S.npcs, privacy: S.privacy, flags: S.flags,
+            events: S.events, chatTab: S.chatTab }, conversationHistory: S.conversationHistory.map(m => ({
+            role: m.role, content: m.content, _wx: m._wx || false })), wxMessages: S.wxMessages,
+        socialFeed: S.socialFeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kpop-sim-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('📤数据已导出！'); }
+
+function importData(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+    reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if (data.version && data.state) {
+                Object.assign(S, data.state);
+                S.flags = data.state.flags || { dark: false, wangben: true, intimacy_scene: false };
+                S.conversationHistory = data.conversationHistory || [];
+                S.wxMessages = data.wxMessages || [];
+                S.socialFeed = data.socialFeed || []; if (S.conversationHistory.length === 0 || S
+                    .conversationHistory[0].role !== 'system') S.conversationHistory.unshift({ role: 'system',
+                    content: buildSP() });
+                switchChatTab(S.chatTab || 'offline');
+                renderStats();
+                updateSettingsUI();
+                updateDiscBadge();
+                showToast('📥数据导入成功！'); } else { showToast('⚠️无效的备份文件'); } } catch (err) { showToast(
+                '⚠️文件解析失败：' + err.message); } };
+    reader.readAsText(file);
+    event.target.value = ''; }
+
+function resetAll() { if (!confirm('确定要重置全部数据吗？此操作不可恢复！\n\n建议先导出备份。')) return;
+    S.affection = 92;
+    S.trust = 88;
+    S.intimacy = 90;
+    S.exposure = 25;
+    S.location = '签售会后台休息室';
+    S.flags = { dark: false, wangben: true, intimacy_scene: false };
+    S.events = ['下周回归舞台彩排', 'Dispatch记者近期活跃于江南区'];
+    S.wxMessages = [];
+    S.conversationHistory = [{ role: 'system', content: buildSP() }, { role: 'assistant', content: OPENING_OFFLINE,
+        _wx: false }];
     initSocialFeed();
-    addOffBubble('char',cleanAI(OPENING_OFFLINE));
-    renderStats();updateSettingsUI();
+    S.newSocialCount = 0;
+    switchChatTab('offline');
+    renderStats();
+    updateSettingsUI();
+    updateDiscBadge();
+    document.getElementById('chatMessages').innerHTML = '';
+    addOffBubble('char', cleanAI(OPENING_OFFLINE));
+    showToast('🔄数据已重置'); }
 
-    const textarea=document.getElementById('userInput');
-    textarea.addEventListener('input',()=>{textarea.style.height='auto';textarea.style.height=Math.min(textarea.scrollHeight,80)+'px';});
+// ═══════════════════ Toast ═══════════════════
+function showToast(msg) { const existing = document.querySelector('.toast'); if (existing) existing.remove(); const toast =
+        document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0';
+        toast.style.transition = 'opacity .3s';
+        setTimeout(() => toast.remove(), 300); }, 2000); }
 
-    const settings=getAPISettings();
-    if(!settings.apiKey)setTimeout(()=>openModal('apiModal'),800);
-
-    setInterval(()=>{const n=new Date();document.getElementById('phoneTime').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');},30000);
-
-    console.log('📱 韩娱嫂子模拟器 v4.0 已就绪 | Char: 郁白 | User: 云雾敛');
-}
+// ═══════════════════ 初始化 ═══════════════════
+function init() { S.conversationHistory = [{ role: 'system', content: buildSP() }, { role: 'assistant',
+        content: OPENING_OFFLINE, _wx: false }];
+    initSocialFeed();
+    addOffBubble('char', cleanAI(OPENING_OFFLINE));
+    renderStats();
+    updateSettingsUI(); const textarea = document.getElementById('userInput');
+    textarea.addEventListener('input', () => { textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 80) + 'px'; }); const settings = getAPISettings(); if (
+        !settings.apiKey) setTimeout(() => openModal('apiModal'), 800);
+    setInterval(() => { const n = new Date();
+        document.getElementById('phoneTime').textContent = String(n.getHours()).padStart(2, '0') + ':' + String(n
+            .getMinutes()).padStart(2, '0'); }, 30000);
+    console.log('📱韩娱嫂子模拟器 v4.0 已就绪 | Char:郁白 | User:云雾敛'); }
 init();
 </script>
 </body>
